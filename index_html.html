@@ -77,16 +77,15 @@ textarea.form-input{resize:vertical}
 .bk-item{display:flex;align-items:center;gap:10px;padding:11px 14px;border:1px solid #e5e5e5;border-radius:10px;margin-bottom:8px;background:#fff}
 .av{width:34px;height:34px;border-radius:50%;background:#EBF4FF;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:600;color:#185FA5;flex-shrink:0}
 .sbadge{font-size:11px;padding:3px 10px;border-radius:20px;font-weight:500;white-space:nowrap}
-.s-ok{background:#EAF3DE;color:#3B6D11}.s-wait{background:#FEF3C7;color:#92400E}.s-no{background:#FCEBEB;color:#A32D2D}
-.rbadge{font-size:11px;padding:3px 10px;border-radius:20px;background:#EBF4FF;color:#185FA5;white-space:nowrap}
+.s-ok{background:#EAF3DE;color:#3B6D11}
+.s-wait{background:#FEF3C7;color:#92400E}
+.s-no{background:#FCEBEB;color:#A32D2D}
 .rrow{display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid #f5f5f5}
 .rrow:last-child{border-bottom:none}
 .empty{text-align:center;padding:2.5rem;color:#ccc;font-size:14px}
 .toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:#1a1a1a;color:#fff;padding:11px 22px;border-radius:8px;font-size:13px;z-index:9999;opacity:0;transition:opacity .3s;pointer-events:none}
 .toast.show{opacity:1}
 .info-box{background:#f0f7ff;border:1px solid #bfdbfe;border-radius:8px;padding:10px 14px;font-size:13px;color:#1d4ed8;margin-bottom:14px}
-
-/* 로그인 화면 */
 .login-wrap{min-height:100vh;display:flex;align-items:center;justify-content:center;background:#f0f2f5}
 .login-card{background:#fff;border-radius:16px;padding:2.5rem;width:100%;max-width:360px;border:1px solid #e5e5e5;text-align:center}
 .login-logo{width:52px;height:52px;border-radius:12px;background:#378ADD;display:flex;align-items:center;justify-content:center;margin:0 auto 16px}
@@ -99,7 +98,6 @@ textarea.form-input{resize:vertical}
 </head>
 <body>
 
-<!-- 로그인 화면 -->
 <div class="login-wrap" id="login-screen">
   <div class="login-card">
     <div class="login-logo">
@@ -113,7 +111,6 @@ textarea.form-input{resize:vertical}
   </div>
 </div>
 
-<!-- 관리자 앱 -->
 <div id="admin-app" style="display:none">
 <div class="app">
   <div class="header">
@@ -139,7 +136,7 @@ textarea.form-input{resize:vertical}
       <div class="sec">미팅 기본 정보</div>
       <div class="form-row">
         <label class="form-label">미팅 이름</label>
-        <input class="form-input" id="meeting-name" value="1:1 미팅"/>
+        <input class="form-input" id="meeting-name" value="1:1 미팅" onchange="saveShared()"/>
       </div>
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
         <div>
@@ -201,7 +198,7 @@ textarea.form-input{resize:vertical}
       <div class="sec">예약 링크</div>
       <p style="font-size:13px;color:#888;margin-bottom:12px">팀원에게 공유할 예약 페이지 링크예요.</p>
       <div style="display:flex;align-items:center;gap:8px;padding:11px 14px;background:#f0f7ff;border:1px solid #bfdbfe;border-radius:9px">
-        <span id="book-link-url" style="font-size:13px;color:#185FA5;flex:1"></span>
+        <span id="book-link-url" style="font-size:13px;color:#185FA5;flex:1">https://1on1-psi.vercel.app/book</span>
         <button class="btn-sm" onclick="copyBookLink()">복사</button>
       </div>
     </div>
@@ -231,28 +228,14 @@ textarea.form-input{resize:vertical}
       <p style="font-size:13px;color:#888;margin-bottom:10px">Power Automate에서 복사한 HTTP URL을 입력하세요.</p>
       <div class="form-row">
         <label class="form-label">예약 확인 이메일 흐름 URL</label>
-        <input class="form-input" id="flow-url" placeholder="https://prod-xx.westus.logic.azure.com/..."/>
+        <input class="form-input" id="flow-url" placeholder="https://prod-xx.westus.logic.azure.com/..." onchange="saveShared()"/>
       </div>
-      <button class="btn-p" onclick="saveFlowUrl()">저장</button>
+      <button class="btn-p" onclick="saveShared();toast('저장됨!')">저장</button>
     </div>
     <div class="card">
-      <div class="sec">리마인더 설정</div>
-      <div class="form-row"><label class="form-label">발송 시점</label>
-        <select class="form-input" id="remind-when">
-          <option value="1440">미팅 24시간 전</option>
-          <option value="60">미팅 1시간 전</option>
-          <option value="30">미팅 30분 전</option>
-        </select>
-      </div>
-      <div class="form-row"><label class="form-label">발송 채널</label>
-        <select class="form-input"><option>Outlook 이메일</option></select>
-      </div>
-      <div class="form-row" style="margin-bottom:0"><label class="form-label">메시지 내용</label>
-        <textarea class="form-input" id="remind-msg" rows="3">[eMnet 1ON1] {예약자명}님, 미팅이 곧 시작됩니다. 📅 {날짜} {시간}</textarea>
-      </div>
-      <button class="btn-p" style="margin-top:14px" onclick="saveReminder()">저장</button>
+      <div class="sec">발송 내역</div>
+      <div id="reminder-log"></div>
     </div>
-    <div class="card"><div class="sec">발송 내역</div><div id="reminder-log"></div></div>
   </div>
 </div>
 </div>
@@ -272,7 +255,6 @@ const HOL={
 const TIMES=[];
 for(let h=8;h<=20;h++) for(let m of[0,30]){if(h===20&&m===30)break;TIMES.push(`${String(h).padStart(2,'0')}:${String(m).padStart(2,'0')}`);}
 
-// 로그인
 function checkPw(){
   const v=document.getElementById('pw-input').value;
   if(v===CORRECT_PW){
@@ -290,17 +272,17 @@ function logout(){
   document.getElementById('pw-input').value='';
 }
 
-// 공유 데이터 (localStorage)
 function loadShared(){try{return JSON.parse(localStorage.getItem('emnet_cfg')||'null');}catch{return null;}}
 function saveShared(){
-  localStorage.setItem('emnet_cfg', JSON.stringify({
-    hostMode, DC: DC.map(c=>({on:c.on,start:c.start,end:c.end,open:[...c.open]})),
-    DATE_CFG: Object.fromEntries(Object.entries(DATE_CFG).map(([k,v])=>[k,{start:v.start,end:v.end,open:[...v.open]}])),
-    duration: document.getElementById('duration').value,
-    interval: document.getElementById('interval').value,
-    meetingName: document.getElementById('meeting-name').value,
-    bookings: G.bookings,
-    flowUrl: document.getElementById('flow-url')?.value||''
+  localStorage.setItem('emnet_cfg',JSON.stringify({
+    hostMode,
+    DC:DC.map(c=>({on:c.on,start:c.start,end:c.end,open:[...c.open]})),
+    DATE_CFG:Object.fromEntries(Object.entries(DATE_CFG).map(([k,v])=>[k,{start:v.start,end:v.end,open:[...v.open]}])),
+    duration:document.getElementById('duration').value,
+    interval:document.getElementById('interval').value,
+    meetingName:document.getElementById('meeting-name').value,
+    bookings:G.bookings,
+    flowUrl:document.getElementById('flow-url')?.value||''
   }));
 }
 
@@ -317,7 +299,7 @@ const DATE_CFG={};
 let selectedHostDate=null;
 let hostMode='weekly';
 let hostCal={m:today.getMonth(),y:today.getFullYear()};
-let G={filter:'all',bookings:[],remLog:[]};
+let G={filter:'all',bookings:[]};
 
 const fmt=(y,m,d)=>`${y}-${String(m).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
 const isPast=ds=>{const[y,m,d]=ds.split('-');return new Date(y,m-1,d)<new Date(today.getFullYear(),today.getMonth(),today.getDate());};
@@ -326,7 +308,6 @@ const getDur=()=>parseInt(document.getElementById('duration').value)||60;
 const getIntv=()=>parseInt(document.getElementById('interval').value)||30;
 const toMin=t=>{const[h,m]=t.split(':').map(Number);return h*60+m;};
 const toTime=m=>`${String(Math.floor(m/60)).padStart(2,'0')}:${String(m%60).padStart(2,'0')}`;
-const wLabel=min=>min>=1440?`${min/1440|0}일 전`:min>=60?`${min/60|0}시간 전`:`${min}분 전`;
 function genStarts(start,end,intv,dur){const a=[];let c=toMin(start);const e=toMin(end);while(c+dur<=e){a.push(toTime(c));c+=intv;}return a;}
 function toast(msg){const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2000);}
 
@@ -343,8 +324,6 @@ function init(){
     if(saved.flowUrl) document.getElementById('flow-url').value=saved.flowUrl;
   }
   setHostMode(hostMode);
-      document.getElementById('book-link-url').textContent='https://1on1-psi.vercel.app/book';
-  renderDayBlocks();
   renderList();
   renderReminderLog();
 }
@@ -431,14 +410,12 @@ function renderHostCal(){
   document.getElementById('host-cal').innerHTML=html;
 }
 function chHostMonth(d){hostCal.m+=d;if(hostCal.m>11){hostCal.m=0;hostCal.y++;}if(hostCal.m<0){hostCal.m=11;hostCal.y--;}renderHostCal();}
-
 function toggleHostDate(ds){
   if(isPast(ds)||isHol(ds))return;
   if(DATE_CFG[ds]&&selectedHostDate===ds){delete DATE_CFG[ds];selectedHostDate=null;document.getElementById('date-slot-editor').style.display='none';renderHostCal();saveShared();toast('날짜 해제됨');return;}
   if(!DATE_CFG[ds]){DATE_CFG[ds]={start:'09:00',end:'18:00',open:new Set(['09:00','10:00','11:00','13:00','14:00','15:00','16:00','17:00'])};toast('날짜 추가됨');}
   selectedHostDate=ds;renderHostCal();renderDateSlotEditor(ds);saveShared();
 }
-
 function renderDateSlotEditor(ds){
   const cfg=DATE_CFG[ds];const p=ds.split('-');const dow=DAYS[(new Date(ds).getDay()+6)%7];
   document.getElementById('date-slot-editor').style.display='block';
@@ -457,29 +434,63 @@ function selectAllDateSlots(){if(!selectedHostDate||!DATE_CFG[selectedHostDate])
 function clearAllDateSlots(){if(!selectedHostDate||!DATE_CFG[selectedHostDate])return;DATE_CFG[selectedHostDate].open.clear();renderDateSlotChecks(selectedHostDate);saveShared();}
 function removeDate(){if(!selectedHostDate)return;delete DATE_CFG[selectedHostDate];selectedHostDate=null;document.getElementById('date-slot-editor').style.display='none';renderHostCal();saveShared();toast('날짜 삭제됨');}
 
-function copyBookLink(){navigator.clipboard.writeText('https://1on1-psi.vercel.app/book').catch(()=>{});toast('링크 복사됨!');}
-function saveFlowUrl(){saveShared();toast('저장됨!');}
-function saveReminder(){saveShared();toast('리마인더 저장됨!');}
+function copyBookLink(){
+  navigator.clipboard.writeText('https://1on1-psi.vercel.app/book').catch(()=>{});
+  toast('링크 복사됨!');
+}
 
-function setFilter(f,el){G.filter=f;document.querySelectorAll('.fbtn').forEach(b=>b.classList.remove('active'));el.classList.add('active');renderList();}
-function cancelBk(id){const b=G.bookings.find(b=>b.id===id);if(!b)return;b.status='cancelled';saveShared();renderList();toast('취소됨');}
-function confirmBk(id){const b=G.bookings.find(b=>b.id===id);if(!b)return;b.status='confirmed';saveShared();renderList();toast('확정됨');}
+/* ══ 예약 현황 ══ */
+function setFilter(f,el){
+  G.filter=f;
+  document.querySelectorAll('.fbtn').forEach(b=>b.classList.remove('active'));
+  el.classList.add('active');
+  renderList();
+}
+
+function confirmBk(bookingId){
+  const idx=G.bookings.findIndex(b=>b.id===bookingId);
+  if(idx===-1)return;
+  G.bookings[idx].status='confirmed';
+  saveShared();
+  renderList();
+  toast('예약이 확정되었어요');
+}
+
+function cancelBk(bookingId){
+  const idx=G.bookings.findIndex(b=>b.id===bookingId);
+  if(idx===-1)return;
+  G.bookings[idx].status='cancelled';
+  saveShared();
+  renderList();
+  toast('예약이 취소되었어요');
+}
 
 function renderList(){
-  const fl=G.bookings.filter(b=>G.filter==='all'||b.status===G.filter).sort((a,b)=>a.date.localeCompare(b.date)||a.slot.localeCompare(b.slot));
+  const saved=loadShared();
+  if(saved&&saved.bookings) G.bookings=saved.bookings;
+  const fl=G.bookings.filter(b=>G.filter==='all'||b.status===G.filter)
+    .sort((a,b)=>a.date.localeCompare(b.date)||a.slot.localeCompare(b.slot));
   document.getElementById('bk-count').textContent=`총 ${fl.length}건`;
   if(!fl.length){document.getElementById('bk-list').innerHTML='<div class="empty">예약이 없습니다</div>';return;}
   document.getElementById('bk-list').innerHTML=fl.map(b=>{
-    const p=b.date.split('-');const dow=DAYS[(new Date(b.date).getDay()+6)%7];
+    const p=b.date.split('-');
+    const dow=DAYS[(new Date(b.date).getDay()+6)%7];
     const sc=b.status==='confirmed'?'s-ok':b.status==='pending'?'s-wait':'s-no';
     const sl=b.status==='confirmed'?'확정':b.status==='pending'?'대기':'취소됨';
+    const bid=b.id;
     return `<div class="bk-item">
       <div class="av">${b.name.slice(0,2)}</div>
-      <div style="min-width:90px"><div style="font-size:14px;font-weight:600">${p[1]}/${p[2]} (${dow})</div><div style="font-size:12px;color:#888">${b.slot} ~ ${b.slotEnd}</div></div>
-      <div style="flex:1;min-width:0"><div style="font-size:14px">${b.name}</div><div style="font-size:12px;color:#999;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${b.memo||b.email}</div></div>
+      <div style="min-width:90px">
+        <div style="font-size:14px;font-weight:600">${p[1]}/${p[2]} (${dow})</div>
+        <div style="font-size:12px;color:#888">${b.slot} ~ ${b.slotEnd}</div>
+      </div>
+      <div style="flex:1;min-width:0">
+        <div style="font-size:14px">${b.name}</div>
+        <div style="font-size:12px;color:#999;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${b.memo||b.email}</div>
+      </div>
       <span class="sbadge ${sc}">${sl}</span>
-      ${b.status==='pending'?`<button class="btn-sm" style="font-size:11px;padding:4px 10px" onclick="confirmBk(${b.id})">확정</button>`:''}
-      ${b.status!=='cancelled'?`<button class="btn-dsm" onclick="cancelBk(${b.id})">취소</button>`:''}
+      ${b.status==='pending'?`<button class="btn-sm" style="font-size:11px;padding:4px 10px" onclick="confirmBk(${bid})">확정</button>`:''}
+      ${b.status!=='cancelled'?`<button class="btn-dsm" onclick="cancelBk(${bid})">취소</button>`:''}
     </div>`;
   }).join('');
 }
@@ -490,7 +501,7 @@ function renderReminderLog(){
   document.getElementById('reminder-log').innerHTML=log.length?log.map(l=>`
     <div style="display:flex;align-items:center;gap:10px;padding:9px 0;border-bottom:1px solid #f5f5f5">
       <div class="av">${l.name.slice(0,2)}</div>
-      <div style="flex:1"><div style="font-size:13px">${l.name} · ${l.ch}</div><div style="font-size:12px;color:#999">${l.time}</div></div>
+      <div style="flex:1"><div style="font-size:13px">${l.name}</div><div style="font-size:12px;color:#999">${l.time}</div></div>
       <span class="sbadge s-ok">${l.st}</span>
     </div>`).join(''):'<div class="empty">발송 내역 없음</div>';
 }
