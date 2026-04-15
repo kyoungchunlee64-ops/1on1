@@ -24,7 +24,7 @@ p{font-size:14px;color:#666;line-height:1.7;margin-bottom:20px}
 </style>
 </head>
 <body>
-<div class="card" id="main-card">
+<div class="card">
   <div class="icon-wrap gray" id="icon-wrap">
     <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#999" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
   </div>
@@ -36,7 +36,6 @@ p{font-size:14px;color:#666;line-height:1.7;margin-bottom:20px}
 
 <script>
 const DAYS=['월','화','수','목','금','토','일'];
-
 function loadCfg(){try{return JSON.parse(localStorage.getItem('emnet_cfg')||'null');}catch{return null;}}
 function saveCfg(cfg){localStorage.setItem('emnet_cfg',JSON.stringify(cfg));}
 
@@ -44,32 +43,26 @@ function init(){
   const params=new URLSearchParams(window.location.search);
   const token=params.get('token');
   if(!token){showError('유효하지 않은 링크입니다.');return;}
-
   const cfg=loadCfg();
   if(!cfg||!cfg.bookings){showError('예약 정보를 찾을 수 없습니다.');return;}
-
   const bk=cfg.bookings.find(b=>b.tok===token);
   if(!bk){showError('예약 정보를 찾을 수 없습니다.');return;}
   if(bk.status==='cancelled'){showAlreadyCancelled();return;}
-
-  // 예약 정보 표시
   const p=bk.date.split('-');
   const dow=DAYS[(new Date(bk.date).getDay()+6)%7];
   document.getElementById('icon-wrap').className='icon-wrap red';
   document.getElementById('icon-wrap').innerHTML=`<svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#dc2626" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg>`;
   document.getElementById('main-title').textContent='예약을 취소하시겠어요?';
-  document.getElementById('main-desc').textContent='아래 예약이 취소됩니다. 취소 후에는 되돌릴 수 없어요.';
+  document.getElementById('main-desc').textContent='아래 예약이 취소됩니다.';
   document.getElementById('info-box').style.display='block';
   document.getElementById('info-box').innerHTML=`
     <div>👤 <strong>${bk.name}</strong></div>
     <div>📅 ${p[1]}월 ${p[2]}일 (${dow})</div>
     <div>⏰ ${bk.slot} ~ ${bk.slotEnd}</div>
-    ${bk.memo?`<div>📝 ${bk.memo}</div>`:''}
-  `;
+    ${bk.memo?`<div>📝 ${bk.memo}</div>`:''}`;
   document.getElementById('btn-area').innerHTML=`
     <button class="btn-d" onclick="doCancel('${token}')">예약 취소 확정</button>
-    <button class="btn-sec" onclick="window.location.href='book.html'">돌아가기</button>
-  `;
+    <button class="btn-sec" onclick="window.location.href='/book'">돌아가기</button>`;
 }
 
 function doCancel(token){
@@ -79,34 +72,27 @@ function doCancel(token){
   if(!bk){showError('예약 정보를 찾을 수 없습니다.');return;}
   bk.status='cancelled';
   saveCfg(cfg);
-  showSuccess(bk);
-}
-
-function showSuccess(bk){
   const p=bk.date.split('-');
   const dow=DAYS[(new Date(bk.date).getDay()+6)%7];
   document.getElementById('icon-wrap').className='icon-wrap green';
   document.getElementById('icon-wrap').innerHTML=`<svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#16a34a" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>`;
   document.getElementById('main-title').textContent='취소가 완료되었어요';
-  document.getElementById('main-desc').textContent='예약이 정상적으로 취소되었습니다.\n해당 시간 슬롯이 다시 열렸어요.';
+  document.getElementById('main-desc').textContent='예약이 취소되었습니다. 해당 슬롯이 다시 열렸어요.';
   document.getElementById('info-box').style.display='block';
-  document.getElementById('info-box').innerHTML=`
-    <div>👤 ${bk.name}</div>
-    <div>📅 ${p[1]}월 ${p[2]}일 (${dow}) ${bk.slot} ~ ${bk.slotEnd}</div>
-  `;
-  document.getElementById('btn-area').innerHTML=`<button class="btn-p" onclick="window.location.href='book.html'">새로 예약하기</button>`;
+  document.getElementById('info-box').innerHTML=`<div>👤 ${bk.name}</div><div>📅 ${p[1]}/${p[2]} (${dow}) ${bk.slot}~${bk.slotEnd}</div>`;
+  document.getElementById('btn-area').innerHTML=`<button class="btn-p" onclick="window.location.href='/book'">새로 예약하기</button>`;
 }
 
 function showAlreadyCancelled(){
   document.getElementById('main-title').textContent='이미 취소된 예약입니다';
   document.getElementById('main-desc').textContent='이미 취소 처리된 예약이에요.';
-  document.getElementById('btn-area').innerHTML=`<button class="btn-p" onclick="window.location.href='book.html'">새로 예약하기</button>`;
+  document.getElementById('btn-area').innerHTML=`<button class="btn-p" onclick="window.location.href='/book'">새로 예약하기</button>`;
 }
 
 function showError(msg){
   document.getElementById('main-title').textContent='오류가 발생했습니다';
   document.getElementById('main-desc').textContent=msg;
-  document.getElementById('btn-area').innerHTML=`<button class="btn-p" onclick="window.location.href='book.html'">예약 페이지로</button>`;
+  document.getElementById('btn-area').innerHTML=`<button class="btn-p" onclick="window.location.href='/book'">예약 페이지로</button>`;
 }
 
 init();
