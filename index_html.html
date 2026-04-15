@@ -448,19 +448,25 @@ function setFilter(f,el){
 }
 
 function confirmBk(bookingId){
-  const idx=G.bookings.findIndex(b=>b.id===bookingId);
+  const saved=loadShared();
+  if(!saved||!saved.bookings)return;
+  const idx=saved.bookings.findIndex(b=>b.id===bookingId);
   if(idx===-1)return;
-  G.bookings[idx].status='confirmed';
-  saveShared();
+  saved.bookings[idx].status='confirmed';
+  localStorage.setItem('emnet_cfg',JSON.stringify(saved));
+  G.bookings=saved.bookings;
   renderList();
   toast('예약이 확정되었어요');
 }
 
 function cancelBk(bookingId){
-  const idx=G.bookings.findIndex(b=>b.id===bookingId);
+  const saved=loadShared();
+  if(!saved||!saved.bookings)return;
+  const idx=saved.bookings.findIndex(b=>b.id===bookingId);
   if(idx===-1)return;
-  G.bookings[idx].status='cancelled';
-  saveShared();
+  saved.bookings[idx].status='cancelled';
+  localStorage.setItem('emnet_cfg',JSON.stringify(saved));
+  G.bookings=saved.bookings;
   renderList();
   toast('예약이 취소되었어요');
 }
