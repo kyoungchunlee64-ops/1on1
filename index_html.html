@@ -1,0 +1,499 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>eMnet 1ON1 — 관리자</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:#f0f2f5;color:#1a1a1a;font-size:15px}
+.app{max-width:700px;margin:0 auto;padding:1.5rem 1rem}
+.header{display:flex;align-items:center;gap:12px;margin-bottom:1.5rem;background:#fff;padding:1rem 1.25rem;border-radius:12px;border:1px solid #e5e5e5}
+.logo{width:38px;height:38px;border-radius:10px;background:#378ADD;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.tabs{display:flex;gap:6px;margin-bottom:1.25rem;flex-wrap:wrap}
+.tab{padding:8px 18px;border-radius:8px;border:1px solid #ddd;background:#fff;cursor:pointer;font-size:13px;color:#666;transition:all .15s}
+.tab.active{background:#378ADD;color:#fff;border-color:#378ADD;font-weight:500}
+.card{background:#fff;border:1px solid #e5e5e5;border-radius:12px;padding:1.25rem;margin-bottom:1rem}
+.sec{font-size:11px;font-weight:600;color:#888;margin-bottom:14px;text-transform:uppercase;letter-spacing:.06em}
+.form-row{margin-bottom:14px}
+.form-label{font-size:13px;color:#555;margin-bottom:6px;display:block;font-weight:500}
+.form-input{width:100%;padding:9px 12px;border:1px solid #ddd;border-radius:8px;font-size:14px;background:#fff;outline:none}
+.form-input:focus{border-color:#378ADD}
+textarea.form-input{resize:vertical}
+.btn-p{padding:10px 20px;background:#378ADD;border:none;border-radius:8px;color:#fff;font-size:14px;font-weight:500;cursor:pointer}
+.btn-p:hover{background:#185FA5}
+.btn-sm{padding:5px 12px;background:#378ADD;border:none;border-radius:7px;color:#fff;font-size:12px;font-weight:500;cursor:pointer}
+.btn-sec{padding:8px 16px;background:#fff;border:1px solid #ddd;border-radius:8px;color:#333;font-size:13px;cursor:pointer}
+.btn-sec:hover{background:#f5f5f5}
+.btn-d{padding:7px 14px;background:#fff;border:1px solid #E24B4A;border-radius:8px;color:#A32D2D;font-size:13px;cursor:pointer}
+.btn-dsm{padding:5px 10px;background:#fff;border:1px solid #E24B4A;border-radius:7px;color:#A32D2D;font-size:12px;cursor:pointer}
+.btn-xs{padding:3px 9px;background:#fff;border:1px solid #ddd;border-radius:5px;font-size:11px;color:#666;cursor:pointer}
+.btn-xs:hover{background:#f5f5f5}
+.mode-seg{display:flex;background:#f0f0f0;border-radius:8px;padding:3px;gap:2px;margin-bottom:16px}
+.mode-seg button{flex:1;padding:7px 10px;border:none;border-radius:6px;font-size:13px;cursor:pointer;background:transparent;color:#666;transition:all .15s;font-weight:500}
+.mode-seg button.active{background:#fff;color:#111;font-weight:600;box-shadow:0 1px 3px rgba(0,0,0,.1)}
+.day-block{border:1px solid #e5e5e5;border-radius:10px;margin-bottom:8px;overflow:hidden}
+.day-header{display:flex;align-items:center;gap:10px;padding:11px 14px;background:#fafafa;cursor:pointer;user-select:none}
+.day-header:hover{background:#f5f5f5}
+.day-name-lbl{font-size:14px;font-weight:600;width:44px}
+.big-toggle{position:relative;width:48px;height:26px;flex-shrink:0}
+.big-toggle input{opacity:0;width:0;height:0}
+.big-sl{position:absolute;cursor:pointer;inset:0;background:#ddd;border-radius:26px;transition:.2s}
+.big-sl:before{content:'';position:absolute;width:18px;height:18px;left:4px;bottom:4px;background:#fff;border-radius:50%;transition:.2s;box-shadow:0 1px 3px rgba(0,0,0,.2)}
+.big-toggle input:checked+.big-sl{background:#378ADD}
+.big-toggle input:checked+.big-sl:before{transform:translateX(22px)}
+.on-off-txt{font-size:12px;font-weight:700}
+.on-off-txt.on{color:#378ADD}
+.on-off-txt.off{color:#ccc}
+.day-summary{font-size:12px;margin-left:auto}
+.day-summary.has{color:#3B6D11;font-weight:600}
+.day-summary.none{color:#bbb}
+.day-body{padding:14px;border-top:1px solid #f0f0f0}
+.range-row{display:flex;align-items:center;gap:10px;margin-bottom:14px}
+.time-sel{padding:7px 10px;border:1px solid #ddd;border-radius:7px;font-size:13px;background:#fff;outline:none;cursor:pointer}
+.time-sel:focus{border-color:#378ADD}
+.slot-checks{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin-top:8px}
+.sc-item{position:relative}
+.sc-item input[type=checkbox]{position:absolute;opacity:0;width:0;height:0}
+.sc-item label{display:block;padding:8px 4px;border:1.5px solid #e5e5e5;border-radius:8px;font-size:12px;text-align:center;cursor:pointer;background:#fff;color:#bbb;transition:all .15s;user-select:none}
+.sc-item label:hover{border-color:#378ADD;color:#185FA5;background:#EBF4FF}
+.sc-item input:checked+label{background:#378ADD;border-color:#378ADD;color:#fff;font-weight:600}
+.week-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:4px}
+.dlabel{font-size:11px;color:#888;text-align:center;padding-bottom:5px;font-weight:500}
+.cal-day{border:1px solid #e5e5e5;border-radius:8px;font-size:13px;min-height:40px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;cursor:pointer;transition:all .12s;color:#333;background:#fff}
+.cal-day:hover:not(.past):not(.hol){border-color:#378ADD;background:#EBF4FF}
+.cal-day.past{opacity:.3;cursor:default;pointer-events:none}
+.cal-day.hol{background:#fff0f0;border-color:#f7c1c1;color:#a32d2d;cursor:default}
+.cal-day.host-open{background:#EAF3DE;border-color:#97C459;color:#2d6a0a;font-weight:600}
+.cal-day.sel{background:#378ADD;border-color:#185FA5;color:#fff;font-weight:600}
+.hname{font-size:8px;color:#a32d2d;line-height:1}
+.month-nav{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px}
+.month-nav button{background:#fff;border:1px solid #ddd;border-radius:7px;padding:5px 14px;cursor:pointer;font-size:16px;line-height:1;color:#555}
+.month-nav button:hover{background:#f5f5f5}
+.month-title{font-size:15px;font-weight:600}
+.filter-row{display:flex;gap:6px;margin-bottom:12px}
+.fbtn{padding:5px 14px;border:1px solid #ddd;border-radius:20px;font-size:12px;cursor:pointer;background:#fff;color:#666}
+.fbtn.active{background:#378ADD;border-color:#378ADD;color:#fff;font-weight:500}
+.bk-item{display:flex;align-items:center;gap:10px;padding:11px 14px;border:1px solid #e5e5e5;border-radius:10px;margin-bottom:8px;background:#fff}
+.av{width:34px;height:34px;border-radius:50%;background:#EBF4FF;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:600;color:#185FA5;flex-shrink:0}
+.sbadge{font-size:11px;padding:3px 10px;border-radius:20px;font-weight:500;white-space:nowrap}
+.s-ok{background:#EAF3DE;color:#3B6D11}.s-wait{background:#FEF3C7;color:#92400E}.s-no{background:#FCEBEB;color:#A32D2D}
+.rbadge{font-size:11px;padding:3px 10px;border-radius:20px;background:#EBF4FF;color:#185FA5;white-space:nowrap}
+.rrow{display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid #f5f5f5}
+.rrow:last-child{border-bottom:none}
+.empty{text-align:center;padding:2.5rem;color:#ccc;font-size:14px}
+.toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:#1a1a1a;color:#fff;padding:11px 22px;border-radius:8px;font-size:13px;z-index:9999;opacity:0;transition:opacity .3s;pointer-events:none}
+.toast.show{opacity:1}
+.info-box{background:#f0f7ff;border:1px solid #bfdbfe;border-radius:8px;padding:10px 14px;font-size:13px;color:#1d4ed8;margin-bottom:14px}
+
+/* 로그인 화면 */
+.login-wrap{min-height:100vh;display:flex;align-items:center;justify-content:center;background:#f0f2f5}
+.login-card{background:#fff;border-radius:16px;padding:2.5rem;width:100%;max-width:360px;border:1px solid #e5e5e5;text-align:center}
+.login-logo{width:52px;height:52px;border-radius:12px;background:#378ADD;display:flex;align-items:center;justify-content:center;margin:0 auto 16px}
+.login-input{width:100%;padding:11px 14px;border:1.5px solid #ddd;border-radius:9px;font-size:15px;outline:none;text-align:center;letter-spacing:4px}
+.login-input:focus{border-color:#378ADD}
+.login-btn{width:100%;padding:12px;background:#378ADD;border:none;border-radius:9px;color:#fff;font-size:15px;font-weight:600;cursor:pointer;margin-top:12px}
+.login-btn:hover{background:#185FA5}
+.login-err{font-size:13px;color:#E24B4A;margin-top:8px;display:none}
+</style>
+</head>
+<body>
+
+<!-- 로그인 화면 -->
+<div class="login-wrap" id="login-screen">
+  <div class="login-card">
+    <div class="login-logo">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+    </div>
+    <div style="font-size:18px;font-weight:700;margin-bottom:6px">eMnet 1ON1</div>
+    <div style="font-size:13px;color:#999;margin-bottom:24px">관리자 페이지</div>
+    <input class="login-input" type="password" id="pw-input" placeholder="비밀번호" onkeydown="if(event.key==='Enter')checkPw()"/>
+    <button class="login-btn" onclick="checkPw()">로그인</button>
+    <div class="login-err" id="pw-err">비밀번호가 올바르지 않습니다</div>
+  </div>
+</div>
+
+<!-- 관리자 앱 -->
+<div id="admin-app" style="display:none">
+<div class="app">
+  <div class="header">
+    <div class="logo">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+    </div>
+    <div style="flex:1">
+      <div style="font-size:13px;color:#999;font-weight:500">관리자</div>
+      <div style="font-size:18px;font-weight:700">eMnet 플래닝본부 1 ON 1</div>
+    </div>
+    <button class="btn-sec" style="font-size:12px;padding:6px 12px" onclick="logout()">로그아웃</button>
+  </div>
+
+  <div class="tabs">
+    <button class="tab active" onclick="switchTab('host')">⚙️ 주최자 설정</button>
+    <button class="tab" onclick="switchTab('list')">📋 예약 현황</button>
+    <button class="tab" onclick="switchTab('reminder')">🔔 리마인더</button>
+  </div>
+
+  <!-- 주최자 설정 -->
+  <div id="tab-host">
+    <div class="card">
+      <div class="sec">미팅 기본 정보</div>
+      <div class="form-row">
+        <label class="form-label">미팅 이름</label>
+        <input class="form-input" id="meeting-name" value="1:1 미팅"/>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+        <div>
+          <label class="form-label">소요 시간</label>
+          <select class="form-input" id="duration" onchange="onSettingChange()">
+            <option value="30">30분</option><option value="45">45분</option>
+            <option value="60" selected>1시간</option><option value="90">1시간 30분</option>
+            <option value="120">2시간</option>
+          </select>
+        </div>
+        <div>
+          <label class="form-label">슬롯 간격</label>
+          <select class="form-input" id="interval" onchange="onSettingChange()">
+            <option value="30" selected>30분마다</option>
+            <option value="60">1시간마다</option>
+          </select>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="sec">가용 시간 설정</div>
+      <div class="mode-seg">
+        <button id="mode-btn-weekly" class="active" onclick="setHostMode('weekly')">📅 요일 반복</button>
+        <button id="mode-btn-dates" onclick="setHostMode('dates')">🗓 특정 날짜 지정</button>
+      </div>
+      <div id="mode-weekly"><div id="day-blocks"></div></div>
+      <div id="mode-dates" style="display:none">
+        <div class="info-box">달력에서 날짜 클릭 → 추가 / 다시 클릭 → 해제</div>
+        <div class="month-nav">
+          <button onclick="chHostMonth(-1)">‹</button>
+          <span class="month-title" id="host-cal-ml"></span>
+          <button onclick="chHostMonth(1)">›</button>
+        </div>
+        <div class="week-grid" id="host-cal-dlabels"></div>
+        <div id="host-cal" style="margin-top:4px"></div>
+        <div id="date-slot-editor" style="display:none;margin-top:14px;padding-top:14px;border-top:1px solid #f0f0f0">
+          <div style="font-size:14px;font-weight:600;margin-bottom:12px" id="date-slot-title"></div>
+          <div class="range-row">
+            <span style="font-size:13px;color:#555;font-weight:500;flex-shrink:0">시간 범위</span>
+            <select class="time-sel" id="date-start" onchange="onDateRangeChange()"></select>
+            <span style="color:#bbb">~</span>
+            <select class="time-sel" id="date-end" onchange="onDateRangeChange()"></select>
+          </div>
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
+            <span style="font-size:12px;color:#888">열어줄 슬롯 선택</span>
+            <div style="display:flex;gap:5px">
+              <button class="btn-xs" onclick="selectAllDateSlots()">전체</button>
+              <button class="btn-xs" onclick="clearAllDateSlots()">초기화</button>
+              <button class="btn-xs" style="color:#E24B4A;border-color:#E24B4A" onclick="removeDate()">날짜 삭제</button>
+            </div>
+          </div>
+          <div class="slot-checks" id="date-slot-checks"></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="sec">예약 링크</div>
+      <p style="font-size:13px;color:#888;margin-bottom:12px">팀원에게 공유할 예약 페이지 링크예요.</p>
+      <div style="display:flex;align-items:center;gap:8px;padding:11px 14px;background:#f0f7ff;border:1px solid #bfdbfe;border-radius:9px">
+        <span id="book-link-url" style="font-size:13px;color:#185FA5;flex:1"></span>
+        <button class="btn-sm" onclick="copyBookLink()">복사</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 예약 현황 -->
+  <div id="tab-list" style="display:none">
+    <div class="card">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px">
+        <div class="sec" style="margin-bottom:0">예약 현황</div>
+        <span id="bk-count" style="font-size:13px;color:#888"></span>
+      </div>
+      <div class="filter-row">
+        <button class="fbtn active" onclick="setFilter('all',this)">전체</button>
+        <button class="fbtn" onclick="setFilter('confirmed',this)">확정</button>
+        <button class="fbtn" onclick="setFilter('pending',this)">대기</button>
+        <button class="fbtn" onclick="setFilter('cancelled',this)">취소됨</button>
+      </div>
+      <div id="bk-list"></div>
+    </div>
+  </div>
+
+  <!-- 리마인더 -->
+  <div id="tab-reminder" style="display:none">
+    <div class="card">
+      <div class="sec">Power Automate 연동 URL</div>
+      <p style="font-size:13px;color:#888;margin-bottom:10px">Power Automate에서 복사한 HTTP URL을 입력하세요.</p>
+      <div class="form-row">
+        <label class="form-label">예약 확인 이메일 흐름 URL</label>
+        <input class="form-input" id="flow-url" placeholder="https://prod-xx.westus.logic.azure.com/..."/>
+      </div>
+      <button class="btn-p" onclick="saveFlowUrl()">저장</button>
+    </div>
+    <div class="card">
+      <div class="sec">리마인더 설정</div>
+      <div class="form-row"><label class="form-label">발송 시점</label>
+        <select class="form-input" id="remind-when">
+          <option value="1440">미팅 24시간 전</option>
+          <option value="60">미팅 1시간 전</option>
+          <option value="30">미팅 30분 전</option>
+        </select>
+      </div>
+      <div class="form-row"><label class="form-label">발송 채널</label>
+        <select class="form-input"><option>Outlook 이메일</option></select>
+      </div>
+      <div class="form-row" style="margin-bottom:0"><label class="form-label">메시지 내용</label>
+        <textarea class="form-input" id="remind-msg" rows="3">[eMnet 1ON1] {예약자명}님, 미팅이 곧 시작됩니다. 📅 {날짜} {시간}</textarea>
+      </div>
+      <button class="btn-p" style="margin-top:14px" onclick="saveReminder()">저장</button>
+    </div>
+    <div class="card"><div class="sec">발송 내역</div><div id="reminder-log"></div></div>
+  </div>
+</div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+const CORRECT_PW='489948';
+const DAYS=['월','화','수','목','금','토','일'];
+const today=new Date();
+const HOL={
+  '2026-01-01':'신정','2026-01-28':'설날','2026-01-29':'설날','2026-01-30':'설날',
+  '2026-03-01':'삼일절','2026-05-05':'어린이날','2026-05-24':'부처님오신날',
+  '2026-06-06':'현충일','2026-08-15':'광복절','2026-09-24':'추석','2026-09-25':'추석','2026-09-26':'추석',
+  '2026-10-03':'개천절','2026-10-09':'한글날','2026-12-25':'크리스마스'
+};
+const TIMES=[];
+for(let h=8;h<=20;h++) for(let m of[0,30]){if(h===20&&m===30)break;TIMES.push(`${String(h).padStart(2,'0')}:${String(m).padStart(2,'0')}`);}
+
+// 로그인
+function checkPw(){
+  const v=document.getElementById('pw-input').value;
+  if(v===CORRECT_PW){
+    document.getElementById('login-screen').style.display='none';
+    document.getElementById('admin-app').style.display='block';
+    init();
+  } else {
+    document.getElementById('pw-err').style.display='block';
+    document.getElementById('pw-input').value='';
+  }
+}
+function logout(){
+  document.getElementById('admin-app').style.display='none';
+  document.getElementById('login-screen').style.display='flex';
+  document.getElementById('pw-input').value='';
+}
+
+// 공유 데이터 (localStorage)
+function loadShared(){try{return JSON.parse(localStorage.getItem('emnet_cfg')||'null');}catch{return null;}}
+function saveShared(){
+  localStorage.setItem('emnet_cfg', JSON.stringify({
+    hostMode, DC: DC.map(c=>({on:c.on,start:c.start,end:c.end,open:[...c.open]})),
+    DATE_CFG: Object.fromEntries(Object.entries(DATE_CFG).map(([k,v])=>[k,{start:v.start,end:v.end,open:[...v.open]}])),
+    duration: document.getElementById('duration').value,
+    interval: document.getElementById('interval').value,
+    meetingName: document.getElementById('meeting-name').value,
+    bookings: G.bookings,
+    flowUrl: document.getElementById('flow-url')?.value||''
+  }));
+}
+
+const DC=[
+  {on:true,start:'09:00',end:'18:00',open:new Set(['09:00','10:00','11:00','13:00','14:00','15:00','16:00','17:00'])},
+  {on:true,start:'09:00',end:'18:00',open:new Set(['09:00','10:00','11:00','13:00','14:00','15:00','16:00','17:00'])},
+  {on:true,start:'09:00',end:'18:00',open:new Set(['09:00','10:00','11:00','13:00','14:00','15:00','16:00','17:00'])},
+  {on:true,start:'09:00',end:'18:00',open:new Set(['09:00','10:00','11:00','13:00','14:00','15:00','16:00','17:00'])},
+  {on:true,start:'09:00',end:'18:00',open:new Set(['09:00','10:00','11:00','13:00','14:00','15:00','16:00','17:00'])},
+  {on:false,start:'09:00',end:'18:00',open:new Set()},
+  {on:false,start:'09:00',end:'18:00',open:new Set()},
+];
+const DATE_CFG={};
+let selectedHostDate=null;
+let hostMode='weekly';
+let hostCal={m:today.getMonth(),y:today.getFullYear()};
+let G={filter:'all',bookings:[],remLog:[]};
+
+const fmt=(y,m,d)=>`${y}-${String(m).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
+const isPast=ds=>{const[y,m,d]=ds.split('-');return new Date(y,m-1,d)<new Date(today.getFullYear(),today.getMonth(),today.getDate());};
+const isHol=ds=>!!HOL[ds];
+const getDur=()=>parseInt(document.getElementById('duration').value)||60;
+const getIntv=()=>parseInt(document.getElementById('interval').value)||30;
+const toMin=t=>{const[h,m]=t.split(':').map(Number);return h*60+m;};
+const toTime=m=>`${String(Math.floor(m/60)).padStart(2,'0')}:${String(m%60).padStart(2,'0')}`;
+const wLabel=min=>min>=1440?`${min/1440|0}일 전`:min>=60?`${min/60|0}시간 전`:`${min}분 전`;
+function genStarts(start,end,intv,dur){const a=[];let c=toMin(start);const e=toMin(end);while(c+dur<=e){a.push(toTime(c));c+=intv;}return a;}
+function toast(msg){const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2000);}
+
+function init(){
+  const saved=loadShared();
+  if(saved){
+    if(saved.DC) saved.DC.forEach((c,i)=>{DC[i].on=c.on;DC[i].start=c.start;DC[i].end=c.end;DC[i].open=new Set(c.open);});
+    if(saved.DATE_CFG) Object.entries(saved.DATE_CFG).forEach(([k,v])=>{DATE_CFG[k]={start:v.start,end:v.end,open:new Set(v.open)};});
+    if(saved.hostMode) hostMode=saved.hostMode;
+    if(saved.bookings) G.bookings=saved.bookings;
+    if(saved.duration) document.getElementById('duration').value=saved.duration;
+    if(saved.interval) document.getElementById('interval').value=saved.interval;
+    if(saved.meetingName) document.getElementById('meeting-name').value=saved.meetingName;
+    if(saved.flowUrl) document.getElementById('flow-url').value=saved.flowUrl;
+  }
+  setHostMode(hostMode);
+  document.getElementById('book-link-url').textContent=window.location.origin+'/book.html';
+  renderDayBlocks();
+  renderList();
+  renderReminderLog();
+}
+
+function switchTab(t){
+  ['host','list','reminder'].forEach(id=>document.getElementById('tab-'+id).style.display=id===t?'block':'none');
+  document.querySelectorAll('.tab').forEach((el,i)=>el.classList.toggle('active',['host','list','reminder'][i]===t));
+  if(t==='list') renderList();
+}
+
+function setHostMode(m){
+  hostMode=m;
+  document.getElementById('mode-weekly').style.display=m==='weekly'?'block':'none';
+  document.getElementById('mode-dates').style.display=m==='dates'?'block':'none';
+  document.getElementById('mode-btn-weekly').classList.toggle('active',m==='weekly');
+  document.getElementById('mode-btn-dates').classList.toggle('active',m==='dates');
+  if(m==='dates') renderHostCal();
+  saveShared();
+}
+
+function onSettingChange(){
+  DAYS.forEach((_,i)=>{const s=genStarts(DC[i].start,DC[i].end,getIntv(),getDur());DC[i].open=new Set([...DC[i].open].filter(x=>s.includes(x)));});
+  Object.keys(DATE_CFG).forEach(ds=>{const s=genStarts(DATE_CFG[ds].start,DATE_CFG[ds].end,getIntv(),getDur());DATE_CFG[ds].open=new Set([...DATE_CFG[ds].open].filter(x=>s.includes(x)));});
+  renderDayBlocks();
+  saveShared();
+}
+
+function renderDayBlocks(){
+  document.getElementById('day-blocks').innerHTML=DAYS.map((d,i)=>{
+    const cfg=DC[i];
+    const starts=genStarts(cfg.start,cfg.end,getIntv(),getDur());
+    const openCnt=[...cfg.open].filter(s=>starts.includes(s)).length;
+    const sumTxt=cfg.on?(openCnt>0?`${openCnt}개 슬롯 열림`:'슬롯 없음'):'비활성';
+    const sumCls=cfg.on&&openCnt>0?'has':'none';
+    const chks=starts.map(s=>`<div class="sc-item"><input type="checkbox" id="wsl_${i}_${s.replace(':','')}" ${cfg.open.has(s)?'checked':''} onchange="toggleWeeklyOpen(${i},'${s}',this.checked)"/><label for="wsl_${i}_${s.replace(':','')}"> ${s}</label></div>`).join('');
+    return `<div class="day-block" id="db-${i}">
+      <div class="day-header" onclick="toggleDayBody(${i})">
+        <label class="big-toggle" onclick="event.stopPropagation()"><input type="checkbox" ${cfg.on?'checked':''} onchange="toggleDayOn(${i},this.checked)"/><span class="big-sl"></span></label>
+        <span class="day-name-lbl">${d}요일</span>
+        <span class="on-off-txt ${cfg.on?'on':'off'}">${cfg.on?'ON':'OFF'}</span>
+        <span class="day-summary ${sumCls}" style="margin-left:auto">${sumTxt}</span>
+        <span style="font-size:14px;color:#bbb;margin-left:10px" id="arr-${i}">${cfg.on?'›':'—'}</span>
+      </div>
+      <div class="day-body" id="dbody-${i}" style="display:none">
+        <div class="range-row">
+          <span style="font-size:13px;color:#555;font-weight:500;flex-shrink:0">시간 범위</span>
+          <select class="time-sel" onchange="changeWeeklyRange(${i},'start',this.value)">${TIMES.map(t=>`<option ${cfg.start===t?'selected':''}>${t}</option>`).join('')}</select>
+          <span style="color:#bbb">~</span>
+          <select class="time-sel" onchange="changeWeeklyRange(${i},'end',this.value)">${TIMES.map(t=>`<option ${cfg.end===t?'selected':''}>${t}</option>`).join('')}</select>
+        </div>
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
+          <span style="font-size:12px;color:#888">열어줄 슬롯 선택</span>
+          <div style="display:flex;gap:5px"><button class="btn-xs" onclick="selAllWeekly(${i})">전체</button><button class="btn-xs" onclick="clrAllWeekly(${i})">초기화</button></div>
+        </div>
+        ${starts.length?`<div class="slot-checks">${chks}</div>`:'<p style="font-size:13px;color:#bbb">범위 내 슬롯 없음</p>'}
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function toggleDayBody(i){if(!DC[i].on)return;const b=document.getElementById(`dbody-${i}`);const a=document.getElementById(`arr-${i}`);const open=b.style.display!=='none';b.style.display=open?'none':'block';a.textContent=open?'›':'⌄';}
+function toggleDayOn(i,on){DC[i].on=on;renderDayBlocks();saveShared();}
+function changeWeeklyRange(i,type,val){DC[i][type]=val;const s=genStarts(DC[i].start,DC[i].end,getIntv(),getDur());DC[i].open=new Set([...DC[i].open].filter(x=>s.includes(x)));renderDayBlocks();saveShared();}
+function toggleWeeklyOpen(i,s,checked){if(checked)DC[i].open.add(s);else DC[i].open.delete(s);saveShared();}
+function selAllWeekly(i){const s=genStarts(DC[i].start,DC[i].end,getIntv(),getDur());s.forEach(x=>DC[i].open.add(x));renderDayBlocks();saveShared();}
+function clrAllWeekly(i){DC[i].open.clear();renderDayBlocks();saveShared();}
+
+function renderHostCal(){
+  const{m,y}=hostCal;
+  document.getElementById('host-cal-ml').textContent=`${y}년 ${m+1}월`;
+  document.getElementById('host-cal-dlabels').innerHTML=DAYS.map(d=>`<div class="dlabel">${d}</div>`).join('');
+  const first=(new Date(y,m,1).getDay()+6)%7,dim=new Date(y,m+1,0).getDate();
+  let html='<div class="week-grid">';
+  for(let i=0;i<first;i++)html+='<div></div>';
+  for(let d=1;d<=dim;d++){
+    const ds=fmt(y,m+1,d);
+    const ip=isPast(ds),h=isHol(ds)?HOL[ds]:null;
+    const isOpen=!!DATE_CFG[ds];const isSel=selectedHostDate===ds;
+    let cls='cal-day';
+    if(ip)cls+=' past';else if(h)cls+=' hol';else if(isSel)cls+=' sel';else if(isOpen)cls+=' host-open';
+    html+=`<div class="${cls}" onclick="toggleHostDate('${ds}')">${d}${h?`<span class="hname">${HOL[ds].slice(0,3)}</span>`:''}</div>`;
+  }
+  html+='</div>';
+  document.getElementById('host-cal').innerHTML=html;
+}
+function chHostMonth(d){hostCal.m+=d;if(hostCal.m>11){hostCal.m=0;hostCal.y++;}if(hostCal.m<0){hostCal.m=11;hostCal.y--;}renderHostCal();}
+
+function toggleHostDate(ds){
+  if(isPast(ds)||isHol(ds))return;
+  if(DATE_CFG[ds]&&selectedHostDate===ds){delete DATE_CFG[ds];selectedHostDate=null;document.getElementById('date-slot-editor').style.display='none';renderHostCal();saveShared();toast('날짜 해제됨');return;}
+  if(!DATE_CFG[ds]){DATE_CFG[ds]={start:'09:00',end:'18:00',open:new Set(['09:00','10:00','11:00','13:00','14:00','15:00','16:00','17:00'])};toast('날짜 추가됨');}
+  selectedHostDate=ds;renderHostCal();renderDateSlotEditor(ds);saveShared();
+}
+
+function renderDateSlotEditor(ds){
+  const cfg=DATE_CFG[ds];const p=ds.split('-');const dow=DAYS[(new Date(ds).getDay()+6)%7];
+  document.getElementById('date-slot-editor').style.display='block';
+  document.getElementById('date-slot-title').textContent=`${p[1]}월 ${p[2]}일 (${dow}) 슬롯 설정`;
+  const fillSel=(id,val)=>{const s=document.getElementById(id);s.innerHTML='';TIMES.forEach(t=>{const o=document.createElement('option');o.value=t;o.textContent=t;if(t===val)o.selected=true;s.appendChild(o);});};
+  fillSel('date-start',cfg.start);fillSel('date-end',cfg.end);
+  renderDateSlotChecks(ds);
+}
+function renderDateSlotChecks(ds){
+  const cfg=DATE_CFG[ds];const starts=genStarts(cfg.start,cfg.end,getIntv(),getDur());
+  document.getElementById('date-slot-checks').innerHTML=starts.map(s=>`<div class="sc-item"><input type="checkbox" id="dsl_${s.replace(':','')}" ${cfg.open.has(s)?'checked':''} onchange="toggleDateOpen('${ds}','${s}',this.checked)"/><label for="dsl_${s.replace(':','')}"> ${s}</label></div>`).join('');
+}
+function onDateRangeChange(){if(!selectedHostDate||!DATE_CFG[selectedHostDate])return;const cfg=DATE_CFG[selectedHostDate];cfg.start=document.getElementById('date-start').value;cfg.end=document.getElementById('date-end').value;const s=genStarts(cfg.start,cfg.end,getIntv(),getDur());cfg.open=new Set([...cfg.open].filter(x=>s.includes(x)));renderDateSlotChecks(selectedHostDate);saveShared();}
+function toggleDateOpen(ds,s,checked){if(!DATE_CFG[ds])return;if(checked)DATE_CFG[ds].open.add(s);else DATE_CFG[ds].open.delete(s);saveShared();}
+function selectAllDateSlots(){if(!selectedHostDate||!DATE_CFG[selectedHostDate])return;const cfg=DATE_CFG[selectedHostDate];genStarts(cfg.start,cfg.end,getIntv(),getDur()).forEach(s=>cfg.open.add(s));renderDateSlotChecks(selectedHostDate);saveShared();}
+function clearAllDateSlots(){if(!selectedHostDate||!DATE_CFG[selectedHostDate])return;DATE_CFG[selectedHostDate].open.clear();renderDateSlotChecks(selectedHostDate);saveShared();}
+function removeDate(){if(!selectedHostDate)return;delete DATE_CFG[selectedHostDate];selectedHostDate=null;document.getElementById('date-slot-editor').style.display='none';renderHostCal();saveShared();toast('날짜 삭제됨');}
+
+function copyBookLink(){navigator.clipboard.writeText(window.location.origin+'/book.html').catch(()=>{});toast('링크 복사됨!');}
+function saveFlowUrl(){saveShared();toast('저장됨!');}
+function saveReminder(){saveShared();toast('리마인더 저장됨!');}
+
+function setFilter(f,el){G.filter=f;document.querySelectorAll('.fbtn').forEach(b=>b.classList.remove('active'));el.classList.add('active');renderList();}
+function cancelBk(id){const b=G.bookings.find(b=>b.id===id);if(!b)return;b.status='cancelled';saveShared();renderList();toast('취소됨');}
+function confirmBk(id){const b=G.bookings.find(b=>b.id===id);if(!b)return;b.status='confirmed';saveShared();renderList();toast('확정됨');}
+
+function renderList(){
+  const fl=G.bookings.filter(b=>G.filter==='all'||b.status===G.filter).sort((a,b)=>a.date.localeCompare(b.date)||a.slot.localeCompare(b.slot));
+  document.getElementById('bk-count').textContent=`총 ${fl.length}건`;
+  if(!fl.length){document.getElementById('bk-list').innerHTML='<div class="empty">예약이 없습니다</div>';return;}
+  document.getElementById('bk-list').innerHTML=fl.map(b=>{
+    const p=b.date.split('-');const dow=DAYS[(new Date(b.date).getDay()+6)%7];
+    const sc=b.status==='confirmed'?'s-ok':b.status==='pending'?'s-wait':'s-no';
+    const sl=b.status==='confirmed'?'확정':b.status==='pending'?'대기':'취소됨';
+    return `<div class="bk-item">
+      <div class="av">${b.name.slice(0,2)}</div>
+      <div style="min-width:90px"><div style="font-size:14px;font-weight:600">${p[1]}/${p[2]} (${dow})</div><div style="font-size:12px;color:#888">${b.slot} ~ ${b.slotEnd}</div></div>
+      <div style="flex:1;min-width:0"><div style="font-size:14px">${b.name}</div><div style="font-size:12px;color:#999;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${b.memo||b.email}</div></div>
+      <span class="sbadge ${sc}">${sl}</span>
+      ${b.status==='pending'?`<button class="btn-sm" style="font-size:11px;padding:4px 10px" onclick="confirmBk(${b.id})">확정</button>`:''}
+      ${b.status!=='cancelled'?`<button class="btn-dsm" onclick="cancelBk(${b.id})">취소</button>`:''}
+    </div>`;
+  }).join('');
+}
+
+function renderReminderLog(){
+  const saved=loadShared();
+  const log=saved?.remLog||[];
+  document.getElementById('reminder-log').innerHTML=log.length?log.map(l=>`
+    <div style="display:flex;align-items:center;gap:10px;padding:9px 0;border-bottom:1px solid #f5f5f5">
+      <div class="av">${l.name.slice(0,2)}</div>
+      <div style="flex:1"><div style="font-size:13px">${l.name} · ${l.ch}</div><div style="font-size:12px;color:#999">${l.time}</div></div>
+      <span class="sbadge s-ok">${l.st}</span>
+    </div>`).join(''):'<div class="empty">발송 내역 없음</div>';
+}
+</script>
+</body>
+</html>
