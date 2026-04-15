@@ -457,7 +457,7 @@ function selectAllDateSlots(){if(!selectedHostDate||!DATE_CFG[selectedHostDate])
 function clearAllDateSlots(){if(!selectedHostDate||!DATE_CFG[selectedHostDate])return;DATE_CFG[selectedHostDate].open.clear();renderDateSlotChecks(selectedHostDate);saveShared();}
 function removeDate(){if(!selectedHostDate)return;delete DATE_CFG[selectedHostDate];selectedHostDate=null;document.getElementById('date-slot-editor').style.display='none';renderHostCal();saveShared();toast('날짜 삭제됨');}
 
-function copyBookLink(){navigator.clipboard.writeText(window.location.origin+'/https://1on1-psi.vercel.app/book').catch(()=>{});toast('링크 복사됨!');}
+function copyBookLink(){navigator.clipboard.writeText(window.location.origin+'https://1on1-psi.vercel.app/book').catch(()=>{});toast('링크 복사됨!');}
 function saveFlowUrl(){saveShared();toast('저장됨!');}
 function saveReminder(){saveShared();toast('리마인더 저장됨!');}
 
