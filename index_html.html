@@ -26,6 +26,7 @@ textarea.form-input{resize:vertical}
 .btn-sec{padding:8px 16px;background:#fff;border:1px solid #ddd;border-radius:8px;color:#333;font-size:13px;cursor:pointer}
 .btn-sec:hover{background:#f5f5f5}
 .btn-d{padding:7px 14px;background:#fff;border:1px solid #E24B4A;border-radius:8px;color:#A32D2D;font-size:13px;cursor:pointer}
+.btn-d:hover{background:#FCEBEB}
 .btn-dsm{padding:5px 10px;background:#fff;border:1px solid #E24B4A;border-radius:7px;color:#A32D2D;font-size:12px;cursor:pointer}
 .btn-xs{padding:3px 9px;background:#fff;border:1px solid #ddd;border-radius:5px;font-size:11px;color:#666;cursor:pointer}
 .btn-xs:hover{background:#f5f5f5}
@@ -71,7 +72,7 @@ textarea.form-input{resize:vertical}
 .month-nav button{background:#fff;border:1px solid #ddd;border-radius:7px;padding:5px 14px;cursor:pointer;font-size:16px;line-height:1;color:#555}
 .month-nav button:hover{background:#f5f5f5}
 .month-title{font-size:15px;font-weight:600}
-.filter-row{display:flex;gap:6px;margin-bottom:12px}
+.filter-row{display:flex;gap:6px;margin-bottom:12px;flex-wrap:wrap}
 .fbtn{padding:5px 14px;border:1px solid #ddd;border-radius:20px;font-size:12px;cursor:pointer;background:#fff;color:#666}
 .fbtn.active{background:#378ADD;border-color:#378ADD;color:#fff;font-weight:500}
 .bk-item{display:flex;align-items:center;gap:10px;padding:11px 14px;border:1px solid #e5e5e5;border-radius:10px;margin-bottom:8px;background:#fff}
@@ -80,8 +81,6 @@ textarea.form-input{resize:vertical}
 .s-ok{background:#EAF3DE;color:#3B6D11}
 .s-wait{background:#FEF3C7;color:#92400E}
 .s-no{background:#FCEBEB;color:#A32D2D}
-.rrow{display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid #f5f5f5}
-.rrow:last-child{border-bottom:none}
 .empty{text-align:center;padding:2.5rem;color:#ccc;font-size:14px}
 .toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:#1a1a1a;color:#fff;padding:11px 22px;border-radius:8px;font-size:13px;z-index:9999;opacity:0;transition:opacity .3s;pointer-events:none}
 .toast.show{opacity:1}
@@ -94,6 +93,15 @@ textarea.form-input{resize:vertical}
 .login-btn{width:100%;padding:12px;background:#378ADD;border:none;border-radius:9px;color:#fff;font-size:15px;font-weight:600;cursor:pointer;margin-top:12px}
 .login-btn:hover{background:#185FA5}
 .login-err{font-size:13px;color:#E24B4A;margin-top:8px;display:none}
+/* 확인 모달 */
+.modal-bg{position:fixed;inset:0;background:rgba(0,0,0,.45);display:flex;align-items:center;justify-content:center;z-index:999;display:none}
+.modal-bg.show{display:flex}
+.modal-box{background:#fff;border-radius:14px;padding:1.75rem 1.5rem;width:100%;max-width:340px;text-align:center;border:1px solid #e5e5e5}
+.modal-icon{font-size:32px;margin-bottom:12px}
+.modal-title{font-size:16px;font-weight:700;margin-bottom:8px;color:#1a1a1a}
+.modal-desc{font-size:13px;color:#888;margin-bottom:20px;line-height:1.6}
+.modal-btns{display:flex;gap:8px}
+.modal-btns button{flex:1;padding:10px;border-radius:8px;font-size:14px;font-weight:500;cursor:pointer}
 </style>
 </head>
 <body>
@@ -108,6 +116,19 @@ textarea.form-input{resize:vertical}
     <input class="login-input" type="password" id="pw-input" placeholder="비밀번호" onkeydown="if(event.key==='Enter')checkPw()"/>
     <button class="login-btn" onclick="checkPw()">로그인</button>
     <div class="login-err" id="pw-err">비밀번호가 올바르지 않습니다</div>
+  </div>
+</div>
+
+<!-- 초기화 확인 모달 -->
+<div class="modal-bg" id="reset-modal">
+  <div class="modal-box">
+    <div class="modal-icon">🗑️</div>
+    <div class="modal-title">예약 전체 초기화</div>
+    <div class="modal-desc">모든 예약 데이터가 삭제됩니다.<br>이 작업은 되돌릴 수 없습니다.</div>
+    <div class="modal-btns">
+      <button style="background:#f5f5f5;border:1px solid #ddd;color:#333" onclick="closeResetModal()">취소</button>
+      <button style="background:#E24B4A;border:none;color:#fff" onclick="doReset()">전체 삭제</button>
+    </div>
   </div>
 </div>
 
@@ -209,7 +230,10 @@ textarea.form-input{resize:vertical}
     <div class="card">
       <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px">
         <div class="sec" style="margin-bottom:0">예약 현황</div>
-        <span id="bk-count" style="font-size:13px;color:#888"></span>
+        <div style="display:flex;align-items:center;gap:8px">
+          <span id="bk-count" style="font-size:13px;color:#888"></span>
+          <button class="btn-d" style="font-size:12px;padding:5px 12px" onclick="openResetModal()">🗑 전체 초기화</button>
+        </div>
       </div>
       <div class="filter-row">
         <button class="fbtn active" onclick="setFilter('all',this)">전체</button>
@@ -311,6 +335,18 @@ const toTime=m=>`${String(Math.floor(m/60)).padStart(2,'0')}:${String(m%60).padS
 function genStarts(start,end,intv,dur){const a=[];let c=toMin(start);const e=toMin(end);while(c+dur<=e){a.push(toTime(c));c+=intv;}return a;}
 function toast(msg){const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2000);}
 
+/* ══ 초기화 모달 ══ */
+function openResetModal(){document.getElementById('reset-modal').classList.add('show');}
+function closeResetModal(){document.getElementById('reset-modal').classList.remove('show');}
+function doReset(){
+  const saved=loadShared();
+  if(saved){saved.bookings=[];localStorage.setItem('emnet_cfg',JSON.stringify(saved));}
+  G.bookings=[];
+  closeResetModal();
+  renderList();
+  toast('예약 현황이 초기화되었어요');
+}
+
 function init(){
   const saved=loadShared();
   if(saved){
@@ -324,6 +360,7 @@ function init(){
     if(saved.flowUrl) document.getElementById('flow-url').value=saved.flowUrl;
   }
   setHostMode(hostMode);
+  renderDayBlocks();
   renderList();
   renderReminderLog();
 }
@@ -340,6 +377,7 @@ function setHostMode(m){
   document.getElementById('mode-dates').style.display=m==='dates'?'block':'none';
   document.getElementById('mode-btn-weekly').classList.toggle('active',m==='weekly');
   document.getElementById('mode-btn-dates').classList.toggle('active',m==='dates');
+  if(m==='weekly') renderDayBlocks();
   if(m==='dates') renderHostCal();
   saveShared();
 }
@@ -439,7 +477,6 @@ function copyBookLink(){
   toast('링크 복사됨!');
 }
 
-/* ══ 예약 현황 ══ */
 function setFilter(f,el){
   G.filter=f;
   document.querySelectorAll('.fbtn').forEach(b=>b.classList.remove('active'));
