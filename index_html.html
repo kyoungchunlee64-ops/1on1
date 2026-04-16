@@ -450,7 +450,7 @@ function setFilter(f,el){
 function confirmBk(bookingId){
   const saved=loadShared();
   if(!saved||!saved.bookings)return;
-  const idx=saved.bookings.findIndex(b=>b.id===bookingId);
+  const idx=saved.bookings.findIndex(b=>String(b.id)===String(bookingId));
   if(idx===-1)return;
   saved.bookings[idx].status='confirmed';
   localStorage.setItem('emnet_cfg',JSON.stringify(saved));
@@ -462,7 +462,7 @@ function confirmBk(bookingId){
 function cancelBk(bookingId){
   const saved=loadShared();
   if(!saved||!saved.bookings)return;
-  const idx=saved.bookings.findIndex(b=>b.id===bookingId);
+  const idx=saved.bookings.findIndex(b=>String(b.id)===String(bookingId));
   if(idx===-1)return;
   saved.bookings[idx].status='cancelled';
   localStorage.setItem('emnet_cfg',JSON.stringify(saved));
