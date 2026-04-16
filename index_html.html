@@ -495,8 +495,8 @@ function renderList(){
         <div style="font-size:12px;color:#999;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${b.memo||b.email}</div>
       </div>
       <span class="sbadge ${sc}">${sl}</span>
-      ${b.status==='pending'?`<button class="btn-sm" style="font-size:11px;padding:4px 10px" onclick="confirmBk(${bid})">확정</button>`:''}
-      ${b.status!=='cancelled'?`<button class="btn-dsm" onclick="cancelBk(${bid})">취소</button>`:''}
+      ${b.status==='pending'?`<button class="btn-sm" style="font-size:11px;padding:4px 10px" onclick="confirmBk('${bid}')">확정</button>`:''}
+      ${b.status!=='cancelled'?`<button class="btn-dsm" onclick="cancelBk('${bid}')">취소</button>`:''}
     </div>`;
   }).join('');
 }
