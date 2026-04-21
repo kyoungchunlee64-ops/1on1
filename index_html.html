@@ -338,10 +338,19 @@ function toast(msg){const t=document.getElementById('toast');t.textContent=msg;t
 /* ══ 초기화 모달 ══ */
 function openResetModal(){document.getElementById('reset-modal').classList.add('show');}
 function closeResetModal(){document.getElementById('reset-modal').classList.remove('show');}
-function doReset(){
-  const saved=loadShared();
-  if(saved){saved.bookings=[];localStorage.setItem('emnet_cfg',JSON.stringify(saved));}
-  G.bookings=[];
+async function doReset(){
+  try{
+    const res=await fetch("https://ms365emnet-my.sharepoint.com/personal/kc_lee_emnet_co_kr/_api/lists/getbytitle('플래닝본부 1ON1 예약알림')/items?$select=ID",{
+      headers:{'Accept':'application/json;odata=nometadata'}
+    });
+    const data=await res.json();
+    const items=data?.value||[];
+    await Promise.all(items.map(i=>
+      fetch(`https://ms365emnet-my.sharepoint.com/personal/kc_lee_emnet_co_kr/_api/lists/getbytitle('플래닝본부 1ON1 예약알림')/items(${i.ID})`,{
+        method:'DELETE',headers:{'IF-MATCH':'*'}
+      })
+    ));
+  }catch(e){console.log('초기화 오류:',e);}
   closeResetModal();
   renderList();
   toast('예약 현황이 초기화되었어요');
@@ -484,56 +493,92 @@ function setFilter(f,el){
   renderList();
 }
 
-function confirmBk(bookingId){
-  const saved=loadShared();
-  if(!saved||!saved.bookings)return;
-  const idx=saved.bookings.findIndex(b=>String(b.id)===String(bookingId));
-  if(idx===-1)return;
-  saved.bookings[idx].status='confirmed';
-  localStorage.setItem('emnet_cfg',JSON.stringify(saved));
-  G.bookings=saved.bookings;
-  renderList();
+/* ══ Lists URL ══ */
+const QUERY_URL='https://default2edf7fa3bf254a2fb1fd9340d34c69.cc.environment.api.powerplatform.com:443/powerautomate/automations/direct/workflows/0fcdcbdbffa94378beb133b676fe592d/triggers/manual/paths/invoke?api-version=1&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=G5qsrP80wugdv4sJtKD31X3laIACgKpOUVINcFHZapk';
+
+const LISTS_ALL_URL='https://ms365emnet-my.sharepoint.com/personal/kc_lee_emnet_co_kr/_api/lists/getbytitle(\'플래닝본부 1ON1 예약알림\')/items?$select=ID,OData__xc608__xc57d__xc790__xba85_,OData__xc774__xba54__xc77c_,OData__xbbf8__xd305__xc77c__xc790_,OData__xbbf8__xd305__xc2dc__xac04_,OData__xba54__xbaa8_,OData__xc0c1__xd0dc_&$orderby=OData__xbbf8__xd305__xc77c__xc790_ asc';
+
+async function fetchAllBookings(){
+  try{
+    document.getElementById('bk-list').innerHTML='<div class="empty">불러오는 중...</div>';
+    const res=await fetch(LISTS_ALL_URL,{
+      headers:{'Accept':'application/json;odata=nometadata'}
+    });
+    const data=await res.json();
+    return (data?.value||[]).map(i=>({
+      id:i.ID,
+      name:i['OData__xc608__xc57d__xc790__xba85_']||'',
+      email:i['OData__xc774__xba54__xc77c_']||'',
+      date:i['OData__xbbf8__xd305__xc77c__xc790_']||'',
+      slot:i['OData__xbbf8__xd305__xc2dc__xac04_']||'',
+      slotEnd:'',
+      memo:i['OData__xba54__xbaa8_']||'',
+      status:typeof i['OData__xc0c1__xd0dc_']==='object'?i['OData__xc0c1__xd0dc_']?.Value||'대기':i['OData__xc0c1__xd0dc_']||'대기'
+    }));
+  }catch(e){
+    console.log('Lists 조회 오류:',e);
+    return [];
+  }
+}
+
+async function confirmBk(bookingId){
+  await updateListsStatus(bookingId,'확정');
   toast('예약이 확정되었어요');
-}
-
-function cancelBk(bookingId){
-  const saved=loadShared();
-  if(!saved||!saved.bookings)return;
-  const idx=saved.bookings.findIndex(b=>String(b.id)===String(bookingId));
-  if(idx===-1)return;
-  saved.bookings[idx].status='cancelled';
-  localStorage.setItem('emnet_cfg',JSON.stringify(saved));
-  G.bookings=saved.bookings;
   renderList();
-  toast('예약이 취소되었어요');
 }
 
-function renderList(){
-  const saved=loadShared();
-  if(saved&&saved.bookings) G.bookings=saved.bookings;
-  const fl=G.bookings.filter(b=>G.filter==='all'||b.status===G.filter)
-    .sort((a,b)=>a.date.localeCompare(b.date)||a.slot.localeCompare(b.slot));
+async function cancelBk(bookingId){
+  await updateListsStatus(bookingId,'취소');
+  toast('예약이 취소되었어요');
+  renderList();
+}
+
+async function updateListsStatus(itemId,status){
+  try{
+    await fetch(`https://ms365emnet-my.sharepoint.com/personal/kc_lee_emnet_co_kr/_api/lists/getbytitle('플래닝본부 1ON1 예약알림')/items(${itemId})`,{
+      method:'PATCH',
+      headers:{
+        'Accept':'application/json;odata=nometadata',
+        'Content-Type':'application/json;odata=nometadata',
+        'IF-MATCH':'*',
+        'X-HTTP-Method':'MERGE'
+      },
+      body:JSON.stringify({'OData__xc0c1__xd0dc_':status})
+    });
+  }catch(e){
+    console.log('상태 업데이트 오류:',e);
+  }
+}
+
+async function renderList(){
+  const allBk=await fetchAllBookings();
+  const statusMap={'대기':'pending','확정':'confirmed','취소':'cancelled'};
+  const mapped=allBk.map(b=>({...b,statusKey:statusMap[b.status]||'pending'}));
+  const fl=mapped.filter(b=>{
+    if(G.filter==='all') return true;
+    return b.statusKey===G.filter;
+  }).sort((a,b)=>a.date.localeCompare(b.date)||a.slot.localeCompare(b.slot));
   document.getElementById('bk-count').textContent=`총 ${fl.length}건`;
   if(!fl.length){document.getElementById('bk-list').innerHTML='<div class="empty">예약이 없습니다</div>';return;}
   document.getElementById('bk-list').innerHTML=fl.map(b=>{
     const p=b.date.split('-');
     const dow=DAYS[(new Date(b.date).getDay()+6)%7];
-    const sc=b.status==='confirmed'?'s-ok':b.status==='pending'?'s-wait':'s-no';
-    const sl=b.status==='confirmed'?'확정':b.status==='pending'?'대기':'취소됨';
+    const sc=b.statusKey==='confirmed'?'s-ok':b.statusKey==='pending'?'s-wait':'s-no';
+    const sl=b.status;
     const bid=b.id;
     return `<div class="bk-item">
-      <div class="av">${b.name.slice(0,2)}</div>
+      <div class="av">${(b.name||'?').slice(0,2)}</div>
       <div style="min-width:90px">
         <div style="font-size:14px;font-weight:600">${p[1]}/${p[2]} (${dow})</div>
-        <div style="font-size:12px;color:#888">${b.slot} ~ ${b.slotEnd}</div>
+        <div style="font-size:12px;color:#888">${b.slot}</div>
       </div>
       <div style="flex:1;min-width:0">
         <div style="font-size:14px">${b.name}</div>
         <div style="font-size:12px;color:#999;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${b.memo||b.email}</div>
       </div>
       <span class="sbadge ${sc}">${sl}</span>
-      ${b.status==='pending'?`<button class="btn-sm" style="font-size:11px;padding:4px 10px" onclick="confirmBk('${bid}')">확정</button>`:''}
-      ${b.status!=='cancelled'?`<button class="btn-dsm" onclick="cancelBk('${bid}')">취소</button>`:''}
+      ${b.statusKey==='pending'?`<button class="btn-sm" style="font-size:11px;padding:4px 10px" onclick="confirmBk('${bid}')">확정</button>`:''}
+      ${b.statusKey!=='cancelled'?`<button class="btn-dsm" onclick="cancelBk('${bid}')">취소</button>`:''}
     </div>`;
   }).join('');
 }
