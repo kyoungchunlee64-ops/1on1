@@ -16,26 +16,30 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 .form-label{font-size:13px;color:#555;margin-bottom:6px;display:block;font-weight:500}
 .form-input{width:100%;padding:9px 12px;border:1px solid #ddd;border-radius:8px;font-size:14px;background:#fff;outline:none}
 .form-input:focus{border-color:#378ADD}
-.btn-p{padding:10px 20px;background:#378ADD;border:none;border-radius:8px;color:#fff;font-size:14px;font-weight:500;cursor:pointer;width:100%}
+.btn-p{padding:12px 20px;background:#378ADD;border:none;border-radius:8px;color:#fff;font-size:14px;font-weight:500;cursor:pointer;width:100%}
 .btn-p:hover{background:#185FA5}
-.btn-sec{padding:8px 16px;background:#fff;border:1px solid #ddd;border-radius:8px;color:#333;font-size:13px;cursor:pointer;width:100%;margin-top:10px}
+.btn-sec{padding:10px 16px;background:#fff;border:1px solid #ddd;border-radius:8px;color:#333;font-size:13px;cursor:pointer;width:100%;margin-top:10px}
 .btn-sec:hover{background:#f5f5f5}
 .week-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:4px}
 .dlabel{font-size:11px;color:#888;text-align:center;padding-bottom:5px;font-weight:500}
 .cal-day{border:1px solid #e5e5e5;border-radius:8px;font-size:13px;min-height:42px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;cursor:pointer;transition:all .12s;color:#333;background:#fff}
-.cal-day:hover:not(.past):not(.hol):not(.off):not(.full){border-color:#378ADD;background:#EBF4FF}
+.cal-day:hover:not(.past):not(.hol):not(.off){border-color:#378ADD;background:#EBF4FF}
 .cal-day.past{opacity:.3;cursor:default;pointer-events:none}
 .cal-day.hol{background:#fff0f0;border-color:#f7c1c1;color:#a32d2d;cursor:default}
 .cal-day.off{opacity:.2;cursor:default;pointer-events:none}
 .cal-day.avail{background:#EAF3DE;border-color:#97C459;color:#2d6a0a;font-weight:500}
 .cal-day.sel{background:#378ADD;border-color:#185FA5;color:#fff;font-weight:600}
-.cal-day.full{background:#f7f7f7;border-color:#eee;color:#bbb;cursor:default}
+.cal-day.has-bk{background:#EAF3DE;border-color:#97C459;color:#2d6a0a;font-weight:500}
+.cal-day.has-bk::after{content:'●';font-size:7px;color:#378ADD;display:block}
 .hname{font-size:8px;color:#a32d2d;line-height:1}
 .month-nav{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px}
 .month-nav button{background:#fff;border:1px solid #ddd;border-radius:7px;padding:5px 14px;cursor:pointer;font-size:16px;line-height:1;color:#555}
 .month-nav button:hover{background:#f5f5f5}
 .month-title{font-size:15px;font-weight:600}
 .slot-list{display:flex;flex-direction:column;gap:6px;max-height:340px;overflow-y:auto;padding-right:2px}
+.slot-list::-webkit-scrollbar{width:4px}
+.slot-list::-webkit-scrollbar-track{background:#f0f0f0;border-radius:4px}
+.slot-list::-webkit-scrollbar-thumb{background:#ccc;border-radius:4px}
 .slot-btn{display:flex;align-items:center;justify-content:space-between;padding:13px 16px;border:1.5px solid #e5e5e5;border-radius:10px;font-size:14px;cursor:pointer;background:#fff;transition:all .15s;text-align:left;width:100%}
 .slot-btn:hover:not(.taken){border-color:#378ADD;background:#EBF4FF;color:#185FA5}
 .slot-btn.taken{background:#f7f7f7;color:#bbb;cursor:default;border-color:#eee}
@@ -50,7 +54,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 .empty{text-align:center;padding:2.5rem;color:#ccc;font-size:14px}
 .toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:#1a1a1a;color:#fff;padding:11px 22px;border-radius:8px;font-size:13px;z-index:9999;opacity:0;transition:opacity .3s;pointer-events:none}
 .toast.show{opacity:1}
-.loading{text-align:center;padding:2rem;color:#888;font-size:13px}
+.no-cfg{text-align:center;padding:3rem 1rem}
 </style>
 </head>
 <body>
@@ -60,58 +64,64 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
       <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
     </div>
     <div>
-      <div style="font-size:13px;color:#999">2026년 1분기 플래닝본부 1 ON 1</div>
+      <div style="font-size:13px;color:#999" id="header-sub">1:1 미팅 예약</div>
       <div style="font-size:18px;font-weight:700">eMnet 플래닝본부 1 ON 1</div>
     </div>
   </div>
 
-  <div class="card" id="cal-card">
-    <div class="sec">날짜 선택</div>
-    <div class="month-nav">
-      <button onclick="chMonth(-1)">‹</button>
-      <span class="month-title" id="book-ml"></span>
-      <button onclick="chMonth(1)">›</button>
-    </div>
-    <div class="week-grid" id="book-dlabels"></div>
-    <div style="margin-top:4px" id="book-cal"><div class="loading">예약 현황 불러오는 중...</div></div>
-    <div class="legend">
-      <div style="display:flex;align-items:center;gap:5px;font-size:12px;color:#666"><div class="ldot" style="background:#EAF3DE;border:1px solid #97C459"></div>예약 가능</div>
-      <div style="display:flex;align-items:center;gap:5px;font-size:12px;color:#666"><div class="ldot" style="background:#f7f7f7;border:1px solid #eee"></div>마감</div>
-      <div style="display:flex;align-items:center;gap:5px;font-size:12px;color:#666"><div class="ldot" style="background:#fff0f0;border:1px solid #f7c1c1"></div>공휴일</div>
-    </div>
+  <div id="no-cfg-msg" class="card no-cfg" style="display:none">
+    <div style="font-size:48px;margin-bottom:16px">🔗</div>
+    <div style="font-size:16px;font-weight:600;margin-bottom:8px">올바른 예약 링크가 필요해요</div>
+    <div style="font-size:13px;color:#888">관리자에게 예약 링크를 받아서 접속해 주세요.</div>
   </div>
 
-  <div class="card" id="slot-card" style="display:none">
-    <div class="sec" id="slot-title">시간 선택</div>
-    <div class="slot-list" id="slot-list"></div>
-  </div>
-
-  <div class="card" id="form-card" style="display:none">
-    <div class="sec">예약자 정보</div>
-    <div class="form-row"><label class="form-label">이름 *</label><input class="form-input" id="book-name" placeholder="홍길동"/></div>
-    <div class="form-row"><label class="form-label">이메일 *</label><input class="form-input" id="book-email" placeholder="example@emnet.co.kr"/></div>
-    <div class="form-row" style="margin-bottom:0"><label class="form-label">미팅 주제 (선택)</label><input class="form-input" id="book-memo" placeholder="어떤 내용으로 미팅할까요?"/></div>
-    <div class="summary-box" id="confirm-summary"></div>
-    <button class="btn-p" style="margin-top:14px;padding:13px" onclick="confirmBooking()">예약 확정하기</button>
-  </div>
-
-  <div id="success-card" style="display:none">
+  <div id="main-content" style="display:none">
     <div class="card">
-      <div class="sbox">
-        🎉 <strong>예약이 완료되었어요!</strong><br/>
-        <span style="font-size:13px">입력하신 이메일로 확인 메일이 발송됩니다.<br/>미팅 전날과 당일 오전에 리마인더를 보내드려요.</span>
+      <div class="sec">날짜 선택</div>
+      <div class="month-nav">
+        <button onclick="chMonth(-1)">‹</button>
+        <span class="month-title" id="book-ml"></span>
+        <button onclick="chMonth(1)">›</button>
       </div>
-      <button class="btn-sec" onclick="resetBooking()">다른 시간 예약하기</button>
+      <div class="week-grid" id="book-dlabels"></div>
+      <div style="margin-top:4px" id="book-cal"></div>
+      <div class="legend">
+        <div style="display:flex;align-items:center;gap:5px;font-size:12px;color:#666"><div class="ldot" style="background:#EAF3DE;border:1px solid #97C459"></div>예약 가능</div>
+        <div style="display:flex;align-items:center;gap:5px;font-size:12px;color:#666"><div class="ldot" style="background:#fff0f0;border:1px solid #f7c1c1"></div>공휴일</div>
+      </div>
+    </div>
+
+    <div class="card" id="slot-card" style="display:none">
+      <div class="sec" id="slot-title">시간 선택</div>
+      <div class="slot-list" id="slot-list"></div>
+    </div>
+
+    <div class="card" id="form-card" style="display:none">
+      <div class="sec">예약자 정보</div>
+      <div class="form-row"><label class="form-label">이름 *</label><input class="form-input" id="book-name" placeholder="홍길동"/></div>
+      <div class="form-row"><label class="form-label">이메일 *</label><input class="form-input" id="book-email" placeholder="example@emnet.co.kr"/></div>
+      <div class="form-row" style="margin-bottom:0"><label class="form-label">미팅 주제 (선택)</label><input class="form-input" id="book-memo" placeholder="어떤 내용으로 미팅할까요?"/></div>
+      <div class="summary-box" id="confirm-summary"></div>
+      <button class="btn-p" style="margin-top:14px" onclick="confirmBooking()">예약 확정하기</button>
+    </div>
+
+    <div id="success-card" style="display:none">
+      <div class="card">
+        <div class="sbox">
+          🎉 <strong>예약이 완료되었어요!</strong><br/>
+          <span style="font-size:13px">이메일로 확인 메일이 발송됩니다.<br/>미팅 전날과 1시간 전에 리마인더를 보내드려요.</span>
+        </div>
+        <button class="btn-sec" onclick="resetBooking()">다른 시간 예약하기</button>
+      </div>
     </div>
   </div>
 </div>
-
 <div class="toast" id="toast"></div>
 
 <script>
 const DAYS=['월','화','수','목','금','토','일'];
+const FLOW_URL='https://default2edf7fa3bf254a2fb1fd9340d34c69.cc.environment.api.powerplatform.com:443/powerautomate/automations/direct/workflows/d1d46520e8f94338bc37d4a483733245/triggers/manual/paths/invoke?api-version=1&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=pIbgu3CfUsxffT-V8GuMKYjnwa1qYRA9W3CqnLiqUSw';
 const today=new Date();
-
 const HOL={
   '2026-01-01':'신정','2026-01-28':'설날','2026-01-29':'설날','2026-01-30':'설날',
   '2026-03-01':'삼일절','2026-05-05':'어린이날','2026-05-24':'부처님오신날',
@@ -119,70 +129,66 @@ const HOL={
   '2026-10-03':'개천절','2026-10-09':'한글날','2026-12-25':'크리스마스'
 };
 
-const FLOW_URL='https://default2edf7fa3bf254a2fb1fd9340d34c69.cc.environment.api.powerplatform.com:443/powerautomate/automations/direct/workflows/d1d46520e8f94338bc37d4a483733245/triggers/manual/paths/invoke?api-version=1&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=pIbgu3CfUsxffT-V8GuMKYjnwa1qYRA9W3CqnLiqUSw';
-
-const QUERY_URL='https://default2edf7fa3bf254a2fb1fd9340d34c69.cc.environment.api.powerplatform.com:443/powerautomate/automations/direct/workflows/0fcdcbdbffa94378beb133b676fe592d/triggers/manual/paths/invoke?api-version=1&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=G5qsrP80wugdv4sJtKD31X3laIACgKpOUVINcFHZapk';
-
-const DATE_CFG={
-  '2026-04-21':{slots:['14:00','17:00'],dur:60},
-  '2026-04-22':{slots:['14:00','17:00'],dur:60},
-  '2026-04-23':{slots:['14:00','17:00'],dur:60},
-  '2026-04-24':{slots:['11:00','15:00'],dur:60},
-  '2026-04-27':{slots:['15:00','17:00'],dur:60},
-  '2026-04-28':{slots:['11:00','16:00'],dur:60},
-  '2026-04-29':{slots:['14:00','17:00'],dur:60},
-};
-
-let takenMap={};
+let CFG=null;
 let bookCal={m:today.getMonth(),y:today.getFullYear()};
 let selDate=null,selSlot=null;
 
 const fmt=(y,m,d)=>`${y}-${String(m).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
 const isPast=ds=>{const[y,m,d]=ds.split('-');return new Date(y,m-1,d)<new Date(today.getFullYear(),today.getMonth(),today.getDate());};
+const isHol=ds=>!!HOL[ds];
 const toMin=t=>{const[h,m]=t.split(':').map(Number);return h*60+m;};
 const toTime=m=>`${String(Math.floor(m/60)).padStart(2,'0')}:${String(m%60).padStart(2,'0')}`;
-const genTok=()=>'tok_'+Math.random().toString(36).slice(2,8);
-function toast(msg){const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2500);}
+const genTok=()=>'tok_'+Date.now()+'_'+Math.random().toString(36).slice(2,6);
+function genStarts(start,end,intv,dur){const a=[];let c=toMin(start);const e=toMin(end);while(c+dur<=e){a.push(toTime(c));c+=intv;}return a;}
+function loadBookings(){try{return JSON.parse(localStorage.getItem('emnet_bookings')||'[]');}catch{return [];}}
+function saveBookings(bks){localStorage.setItem('emnet_bookings',JSON.stringify(bks));}
+function toast(msg){const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2000);}
 
-async function fetchTakenSlots(date){
+function init(){
+  // URL에서 cfg 파라미터 읽기
+  const params=new URLSearchParams(window.location.search);
+  const encoded=params.get('cfg');
+  if(!encoded){
+    document.getElementById('no-cfg-msg').style.display='block';
+    return;
+  }
   try{
-    const res=await fetch(QUERY_URL,{
-      method:'POST',
-      headers:{'Content-Type':'application/json'},
-      body:JSON.stringify({date})
-    });
-    const data=await res.json();
-    const items=data?.value||[];
-    return items
-      .filter(i=>{
-        const status=i['OData__xc0c1__xd0dc_'];
-        const val=typeof status==='object'?status?.Value:status;
-        return val!=='취소';
-      })
-      .map(i=>i['OData__xbbf8__xd305__xc2dc__xac04_']);
+    CFG=JSON.parse(decodeURIComponent(escape(atob(encoded))));
+    document.getElementById('main-content').style.display='block';
+    if(CFG.name) document.getElementById('header-sub').textContent=CFG.name+' 예약';
+    renderBookCal();
   }catch(e){
-    console.log('조회 오류:',e);
-    return [];
+    document.getElementById('no-cfg-msg').style.display='block';
   }
 }
 
-async function preloadBookings(){
-  const dates=Object.keys(DATE_CFG).filter(ds=>!isPast(ds));
-  await Promise.all(dates.map(async ds=>{
-    takenMap[ds]=await fetchTakenSlots(ds);
-  }));
-  renderBookCal();
-}
-
 function isAvailDate(ds){
-  if(!DATE_CFG[ds]||HOL[ds]||isPast(ds)) return false;
-  return DATE_CFG[ds].slots.length>0;
+  if(!CFG||isHol(ds)||isPast(ds)) return false;
+  if(CFG.mode==='weekly'){
+    const dow=(new Date(ds).getDay()+6)%7;
+    const dc=CFG.DC[dow];
+    if(!dc||!dc.on) return false;
+    const starts=genStarts(dc.start,dc.end,CFG.intv,CFG.dur);
+    return dc.open.some(s=>starts.includes(s));
+  } else {
+    const dc=CFG.dates&&CFG.dates[ds];
+    if(!dc) return false;
+    const starts=genStarts(dc.start,dc.end,CFG.intv,CFG.dur);
+    return dc.open.some(s=>starts.includes(s));
+  }
 }
 
 function getOpenSlots(ds){
-  if(!DATE_CFG[ds]) return [];
-  const dur=DATE_CFG[ds].dur||60;
-  return DATE_CFG[ds].slots.map(s=>({start:s,end:toTime(toMin(s)+dur)}));
+  if(!CFG) return [];
+  let dc;
+  if(CFG.mode==='weekly'){
+    const dow=(new Date(ds).getDay()+6)%7;
+    dc=CFG.DC[dow];if(!dc||!dc.on)return [];
+  } else {
+    dc=CFG.dates&&CFG.dates[ds];if(!dc)return [];
+  }
+  const starts=genStarts(dc.start,dc.end,CFG.intv,CFG.dur);
+  return dc.open.filter(s=>starts.includes(s)).sort().map(s=>({start:s,end:toTime(toMin(s)+CFG.dur)}));
 }
 
 function renderBookCal(){
@@ -194,20 +200,15 @@ function renderBookCal(){
   for(let i=0;i<first;i++)html+='<div></div>';
   for(let d=1;d<=dim;d++){
     const ds=fmt(y,m+1,d);
-    const ip=isPast(ds),h=HOL[ds]||null;
-    const av=isAvailDate(ds);
-    const taken=takenMap[ds]||[];
-    const allSlots=DATE_CFG[ds]?.slots||[];
-    const isFull=av&&allSlots.length>0&&allSlots.every(s=>taken.includes(s));
+    const ip=isPast(ds),h=isHol(ds)?HOL[ds]:null;
+    const av=!ip&&isAvailDate(ds);
+    const bks=loadBookings();
+    const hasBk=bks.some(b=>b.date===ds&&b.status!=='cancelled');
     const isSel=selDate===ds;
     let cls='cal-day';
-    if(ip)cls+=' past';
-    else if(h)cls+=' hol';
-    else if(!av)cls+=' off';
-    else if(isSel)cls+=' sel';
-    else if(isFull)cls+=' full';
-    else cls+=' avail';
-    html+=`<div class="${cls}" onclick="selDateFn('${ds}')">${d}${h?`<span class="hname">${h.slice(0,3)}</span>`:''}</div>`;
+    if(ip)cls+=' past';else if(h)cls+=' hol';else if(!av)cls+=' off';
+    else if(isSel)cls+=' sel';else if(hasBk)cls+=' has-bk';else cls+=' avail';
+    html+=`<div class="${cls}" onclick="selDateFn('${ds}')">${d}${h?`<span class="hname">${HOL[ds].slice(0,3)}</span>`:''}</div>`;
   }
   html+='</div>';
   document.getElementById('book-cal').innerHTML=html;
@@ -215,17 +216,16 @@ function renderBookCal(){
 
 function chMonth(d){bookCal.m+=d;if(bookCal.m>11){bookCal.m=0;bookCal.y++;}if(bookCal.m<0){bookCal.m=11;bookCal.y--;}renderBookCal();}
 
-async function selDateFn(ds){
-  if(!isAvailDate(ds)||HOL[ds]||isPast(ds))return;
+function selDateFn(ds){
+  if(!isAvailDate(ds))return;
   selDate=ds;selSlot=null;
   document.getElementById('form-card').style.display='none';
   document.getElementById('slot-card').style.display='block';
   renderBookCal();
   const p=ds.split('-');const dow=(new Date(ds).getDay()+6)%7;
   document.getElementById('slot-title').textContent=`${p[1]}월 ${p[2]}일 (${DAYS[dow]}) — 시간 선택`;
-  document.getElementById('slot-list').innerHTML='<div class="loading">슬롯 확인 중...</div>';
-  const taken=await fetchTakenSlots(ds);
-  takenMap[ds]=taken;
+  const bks=loadBookings();
+  const taken=bks.filter(b=>b.date===ds&&b.status!=='cancelled').map(b=>b.slot);
   const slots=getOpenSlots(ds);
   if(!slots.length){document.getElementById('slot-list').innerHTML='<div class="empty">열려있는 슬롯이 없어요</div>';return;}
   document.getElementById('slot-list').innerHTML=slots.map(s=>{
@@ -248,33 +248,25 @@ function selSlotFn(start,end,taken){
   document.getElementById('form-card').style.display='block';
 }
 
-async function confirmBooking(){
+function confirmBooking(){
   const name=document.getElementById('book-name').value.trim();
   const email=document.getElementById('book-email').value.trim();
   if(!name||!email){toast('이름과 이메일을 입력해 주세요');return;}
   if(!selDate||!selSlot)return;
-
-  // 중복 예약 방지 최종 확인
-  const taken=await fetchTakenSlots(selDate);
-  if(taken.includes(selSlot.start)){
-    toast('방금 다른 분이 예약하셨어요. 다른 시간을 선택해주세요.');
-    takenMap[selDate]=taken;
-    await selDateFn(selDate);
-    return;
-  }
-
   const tok=genTok();
+  const bk={tok,date:selDate,slot:selSlot.start,slotEnd:selSlot.end,name,email,memo:document.getElementById('book-memo').value,status:'pending'};
+  const bks=loadBookings();
+  bks.push(bk);
+  saveBookings(bks);
 
-  // Power Automate로 Lists 저장 + 이메일 발송
-  fetch(FLOW_URL,{
-    method:'POST',
-    headers:{'Content-Type':'application/json'},
-    body:JSON.stringify({name,email,date:selDate,slot:selSlot.start,slotEnd:selSlot.end,memo:document.getElementById('book-memo').value,token:tok})
-  }).catch(err=>console.log('Flow 오류:',err));
-
-  // 로컬 캐시 업데이트
-  if(!takenMap[selDate]) takenMap[selDate]=[];
-  takenMap[selDate].push(selSlot.start);
+  // Power Automate 이메일 발송
+  if(FLOW_URL){
+    fetch(FLOW_URL,{
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({name,email,date:selDate,slot:selSlot.start,slotEnd:selSlot.end,memo:bk.memo,token:tok})
+    }).catch(e=>console.log('이메일 발송 오류:',e));
+  }
 
   document.getElementById('form-card').style.display='none';
   document.getElementById('slot-card').style.display='none';
@@ -292,7 +284,7 @@ function resetBooking(){
   renderBookCal();
 }
 
-preloadBookings();
+init();
 </script>
 </body>
 </html>
