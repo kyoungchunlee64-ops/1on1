@@ -26,7 +26,6 @@ textarea.form-input{resize:vertical}
 .btn-sec{padding:8px 16px;background:#fff;border:1px solid #ddd;border-radius:8px;color:#333;font-size:13px;cursor:pointer}
 .btn-sec:hover{background:#f5f5f5}
 .btn-d{padding:7px 14px;background:#fff;border:1px solid #E24B4A;border-radius:8px;color:#A32D2D;font-size:13px;cursor:pointer}
-.btn-d:hover{background:#FCEBEB}
 .btn-dsm{padding:5px 10px;background:#fff;border:1px solid #E24B4A;border-radius:7px;color:#A32D2D;font-size:12px;cursor:pointer}
 .btn-xs{padding:3px 9px;background:#fff;border:1px solid #ddd;border-radius:5px;font-size:11px;color:#666;cursor:pointer}
 .btn-xs:hover{background:#f5f5f5}
@@ -52,7 +51,6 @@ textarea.form-input{resize:vertical}
 .day-body{padding:14px;border-top:1px solid #f0f0f0}
 .range-row{display:flex;align-items:center;gap:10px;margin-bottom:14px}
 .time-sel{padding:7px 10px;border:1px solid #ddd;border-radius:7px;font-size:13px;background:#fff;outline:none;cursor:pointer}
-.time-sel:focus{border-color:#378ADD}
 .slot-checks{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin-top:8px}
 .sc-item{position:relative}
 .sc-item input[type=checkbox]{position:absolute;opacity:0;width:0;height:0}
@@ -72,7 +70,7 @@ textarea.form-input{resize:vertical}
 .month-nav button{background:#fff;border:1px solid #ddd;border-radius:7px;padding:5px 14px;cursor:pointer;font-size:16px;line-height:1;color:#555}
 .month-nav button:hover{background:#f5f5f5}
 .month-title{font-size:15px;font-weight:600}
-.filter-row{display:flex;gap:6px;margin-bottom:12px;flex-wrap:wrap}
+.filter-row{display:flex;gap:6px;margin-bottom:12px}
 .fbtn{padding:5px 14px;border:1px solid #ddd;border-radius:20px;font-size:12px;cursor:pointer;background:#fff;color:#666}
 .fbtn.active{background:#378ADD;border-color:#378ADD;color:#fff;font-weight:500}
 .bk-item{display:flex;align-items:center;gap:10px;padding:11px 14px;border:1px solid #e5e5e5;border-radius:10px;margin-bottom:8px;background:#fff}
@@ -93,15 +91,7 @@ textarea.form-input{resize:vertical}
 .login-btn{width:100%;padding:12px;background:#378ADD;border:none;border-radius:9px;color:#fff;font-size:15px;font-weight:600;cursor:pointer;margin-top:12px}
 .login-btn:hover{background:#185FA5}
 .login-err{font-size:13px;color:#E24B4A;margin-top:8px;display:none}
-/* 확인 모달 */
-.modal-bg{position:fixed;inset:0;background:rgba(0,0,0,.45);display:flex;align-items:center;justify-content:center;z-index:999;display:none}
-.modal-bg.show{display:flex}
-.modal-box{background:#fff;border-radius:14px;padding:1.75rem 1.5rem;width:100%;max-width:340px;text-align:center;border:1px solid #e5e5e5}
-.modal-icon{font-size:32px;margin-bottom:12px}
-.modal-title{font-size:16px;font-weight:700;margin-bottom:8px;color:#1a1a1a}
-.modal-desc{font-size:13px;color:#888;margin-bottom:20px;line-height:1.6}
-.modal-btns{display:flex;gap:8px}
-.modal-btns button{flex:1;padding:10px;border-radius:8px;font-size:14px;font-weight:500;cursor:pointer}
+.link-result{background:#f0f7ff;border:1px solid #bfdbfe;border-radius:9px;padding:12px 14px;margin-top:12px;word-break:break-all;font-size:12px;color:#185FA5;line-height:1.6}
 </style>
 </head>
 <body>
@@ -119,19 +109,6 @@ textarea.form-input{resize:vertical}
   </div>
 </div>
 
-<!-- 초기화 확인 모달 -->
-<div class="modal-bg" id="reset-modal">
-  <div class="modal-box">
-    <div class="modal-icon">🗑️</div>
-    <div class="modal-title">예약 전체 초기화</div>
-    <div class="modal-desc">모든 예약 데이터가 삭제됩니다.<br>이 작업은 되돌릴 수 없습니다.</div>
-    <div class="modal-btns">
-      <button style="background:#f5f5f5;border:1px solid #ddd;color:#333" onclick="closeResetModal()">취소</button>
-      <button style="background:#E24B4A;border:none;color:#fff" onclick="doReset()">전체 삭제</button>
-    </div>
-  </div>
-</div>
-
 <div id="admin-app" style="display:none">
 <div class="app">
   <div class="header">
@@ -139,7 +116,7 @@ textarea.form-input{resize:vertical}
       <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
     </div>
     <div style="flex:1">
-      <div style="font-size:13px;color:#999;font-weight:500">관리자</div>
+      <div style="font-size:13px;color:#999">관리자</div>
       <div style="font-size:18px;font-weight:700">eMnet 플래닝본부 1 ON 1</div>
     </div>
     <button class="btn-sec" style="font-size:12px;padding:6px 12px" onclick="logout()">로그아웃</button>
@@ -148,7 +125,6 @@ textarea.form-input{resize:vertical}
   <div class="tabs">
     <button class="tab active" onclick="switchTab('host')">⚙️ 주최자 설정</button>
     <button class="tab" onclick="switchTab('list')">📋 예약 현황</button>
-    <button class="tab" onclick="switchTab('reminder')">🔔 리마인더</button>
   </div>
 
   <!-- 주최자 설정 -->
@@ -157,12 +133,12 @@ textarea.form-input{resize:vertical}
       <div class="sec">미팅 기본 정보</div>
       <div class="form-row">
         <label class="form-label">미팅 이름</label>
-        <input class="form-input" id="meeting-name" value="1:1 미팅" onchange="saveShared()"/>
+        <input class="form-input" id="meeting-name" value="1:1 미팅"/>
       </div>
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
         <div>
           <label class="form-label">소요 시간</label>
-          <select class="form-input" id="duration" onchange="onSettingChange()">
+          <select class="form-input" id="duration" onchange="rebuildSlots()">
             <option value="30">30분</option><option value="45">45분</option>
             <option value="60" selected>1시간</option><option value="90">1시간 30분</option>
             <option value="120">2시간</option>
@@ -170,7 +146,7 @@ textarea.form-input{resize:vertical}
         </div>
         <div>
           <label class="form-label">슬롯 간격</label>
-          <select class="form-input" id="interval" onchange="onSettingChange()">
+          <select class="form-input" id="interval" onchange="rebuildSlots()">
             <option value="30" selected>30분마다</option>
             <option value="60">1시간마다</option>
           </select>
@@ -181,21 +157,21 @@ textarea.form-input{resize:vertical}
     <div class="card">
       <div class="sec">가용 시간 설정</div>
       <div class="mode-seg">
-        <button id="mode-btn-weekly" class="active" onclick="setHostMode('weekly')">📅 요일 반복</button>
-        <button id="mode-btn-dates" onclick="setHostMode('dates')">🗓 특정 날짜 지정</button>
+        <button id="mode-btn-weekly" class="active" onclick="setMode('weekly')">📅 요일 반복</button>
+        <button id="mode-btn-dates" onclick="setMode('dates')">🗓 특정 날짜 지정</button>
       </div>
       <div id="mode-weekly"><div id="day-blocks"></div></div>
       <div id="mode-dates" style="display:none">
-        <div class="info-box">달력에서 날짜 클릭 → 추가 / 다시 클릭 → 해제</div>
+        <div class="info-box">날짜 클릭 → 추가 (초록색) / 다시 클릭 → 해제</div>
         <div class="month-nav">
           <button onclick="chHostMonth(-1)">‹</button>
-          <span class="month-title" id="host-cal-ml"></span>
+          <span class="month-title" id="host-ml"></span>
           <button onclick="chHostMonth(1)">›</button>
         </div>
-        <div class="week-grid" id="host-cal-dlabels"></div>
+        <div class="week-grid" id="host-dlabels"></div>
         <div id="host-cal" style="margin-top:4px"></div>
-        <div id="date-slot-editor" style="display:none;margin-top:14px;padding-top:14px;border-top:1px solid #f0f0f0">
-          <div style="font-size:14px;font-weight:600;margin-bottom:12px" id="date-slot-title"></div>
+        <div id="date-editor" style="display:none;margin-top:14px;padding-top:14px;border-top:1px solid #f0f0f0">
+          <div style="font-size:14px;font-weight:600;margin-bottom:12px" id="date-editor-title"></div>
           <div class="range-row">
             <span style="font-size:13px;color:#555;font-weight:500;flex-shrink:0">시간 범위</span>
             <select class="time-sel" id="date-start" onchange="onDateRangeChange()"></select>
@@ -205,8 +181,8 @@ textarea.form-input{resize:vertical}
           <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
             <span style="font-size:12px;color:#888">열어줄 슬롯 선택</span>
             <div style="display:flex;gap:5px">
-              <button class="btn-xs" onclick="selectAllDateSlots()">전체</button>
-              <button class="btn-xs" onclick="clearAllDateSlots()">초기화</button>
+              <button class="btn-xs" onclick="selAllDate()">전체</button>
+              <button class="btn-xs" onclick="clrAllDate()">초기화</button>
               <button class="btn-xs" style="color:#E24B4A;border-color:#E24B4A" onclick="removeDate()">날짜 삭제</button>
             </div>
           </div>
@@ -215,12 +191,14 @@ textarea.form-input{resize:vertical}
       </div>
     </div>
 
+    <!-- 예약 링크 생성 -->
     <div class="card">
-      <div class="sec">예약 링크</div>
-      <p style="font-size:13px;color:#888;margin-bottom:12px">팀원에게 공유할 예약 페이지 링크예요.</p>
-      <div style="display:flex;align-items:center;gap:8px;padding:11px 14px;background:#f0f7ff;border:1px solid #bfdbfe;border-radius:9px">
-        <span id="book-link-url" style="font-size:13px;color:#185FA5;flex:1">https://1on1-psi.vercel.app/book</span>
-        <button class="btn-sm" onclick="copyBookLink()">복사</button>
+      <div class="sec">예약 링크 생성</div>
+      <p style="font-size:13px;color:#888;margin-bottom:14px">설정 완료 후 버튼을 눌러 링크를 생성하세요. 이 링크를 팀원에게 공유하면 설정한 날짜/슬롯이 그대로 보여요.</p>
+      <button class="btn-p" style="width:100%" onclick="generateBookLink()">🔗 예약 링크 생성</button>
+      <div id="link-result" style="display:none">
+        <div class="link-result" id="link-url-text"></div>
+        <button class="btn-sm" style="margin-top:8px;width:100%" onclick="copyBookLink()">복사</button>
       </div>
     </div>
   </div>
@@ -230,9 +208,9 @@ textarea.form-input{resize:vertical}
     <div class="card">
       <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px">
         <div class="sec" style="margin-bottom:0">예약 현황</div>
-        <div style="display:flex;align-items:center;gap:8px">
+        <div style="display:flex;gap:8px;align-items:center">
           <span id="bk-count" style="font-size:13px;color:#888"></span>
-          <button class="btn-d" style="font-size:12px;padding:5px 12px" onclick="openResetModal()">🗑 전체 초기화</button>
+          <button class="btn-xs" onclick="renderList()">새로고침</button>
         </div>
       </div>
       <div class="filter-row">
@@ -244,23 +222,6 @@ textarea.form-input{resize:vertical}
       <div id="bk-list"></div>
     </div>
   </div>
-
-  <!-- 리마인더 -->
-  <div id="tab-reminder" style="display:none">
-    <div class="card">
-      <div class="sec">Power Automate 연동 URL</div>
-      <p style="font-size:13px;color:#888;margin-bottom:10px">Power Automate에서 복사한 HTTP URL을 입력하세요.</p>
-      <div class="form-row">
-        <label class="form-label">예약 확인 이메일 흐름 URL</label>
-        <input class="form-input" id="flow-url" placeholder="https://prod-xx.westus.logic.azure.com/..." onchange="saveShared()"/>
-      </div>
-      <button class="btn-p" onclick="saveShared();toast('저장됨!')">저장</button>
-    </div>
-    <div class="card">
-      <div class="sec">발송 내역</div>
-      <div id="reminder-log"></div>
-    </div>
-  </div>
 </div>
 </div>
 
@@ -269,6 +230,7 @@ textarea.form-input{resize:vertical}
 <script>
 const CORRECT_PW='489948';
 const DAYS=['월','화','수','목','금','토','일'];
+const BASE_URL='https://1on1-psi.vercel.app';
 const today=new Date();
 const HOL={
   '2026-01-01':'신정','2026-01-28':'설날','2026-01-29':'설날','2026-01-30':'설날',
@@ -278,6 +240,36 @@ const HOL={
 };
 const TIMES=[];
 for(let h=8;h<=20;h++) for(let m of[0,30]){if(h===20&&m===30)break;TIMES.push(`${String(h).padStart(2,'0')}:${String(m).padStart(2,'0')}`);}
+
+// 설정 데이터
+const DC=[
+  {on:true,start:'09:00',end:'18:00',open:new Set(['09:00','10:00','11:00','13:00','14:00','15:00','16:00','17:00'])},
+  {on:true,start:'09:00',end:'18:00',open:new Set(['09:00','10:00','11:00','13:00','14:00','15:00','16:00','17:00'])},
+  {on:true,start:'09:00',end:'18:00',open:new Set(['09:00','10:00','11:00','13:00','14:00','15:00','16:00','17:00'])},
+  {on:true,start:'09:00',end:'18:00',open:new Set(['09:00','10:00','11:00','13:00','14:00','15:00','16:00','17:00'])},
+  {on:true,start:'09:00',end:'18:00',open:new Set(['09:00','10:00','11:00','13:00','14:00','15:00','16:00','17:00'])},
+  {on:false,start:'09:00',end:'18:00',open:new Set()},
+  {on:false,start:'09:00',end:'18:00',open:new Set()},
+];
+const DATE_CFG={};
+let selHostDate=null;
+let hostMode='weekly';
+let hostCal={m:today.getMonth(),y:today.getFullYear()};
+let filter='all';
+
+// 예약 데이터는 localStorage에 저장
+function loadBookings(){try{return JSON.parse(localStorage.getItem('emnet_bookings')||'[]');}catch{return [];}}
+function saveBookings(bks){localStorage.setItem('emnet_bookings',JSON.stringify(bks));}
+
+const fmt=(y,m,d)=>`${y}-${String(m).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
+const isPast=ds=>{const[y,m,d]=ds.split('-');return new Date(y,m-1,d)<new Date(today.getFullYear(),today.getMonth(),today.getDate());};
+const isHol=ds=>!!HOL[ds];
+const getDur=()=>parseInt(document.getElementById('duration').value)||60;
+const getIntv=()=>parseInt(document.getElementById('interval').value)||30;
+const toMin=t=>{const[h,m]=t.split(':').map(Number);return h*60+m;};
+const toTime=m=>`${String(Math.floor(m/60)).padStart(2,'0')}:${String(m%60).padStart(2,'0')}`;
+function genStarts(start,end,intv,dur){const a=[];let c=toMin(start);const e=toMin(end);while(c+dur<=e){a.push(toTime(c));c+=intv;}return a;}
+function toast(msg){const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2000);}
 
 function checkPw(){
   const v=document.getElementById('pw-input').value;
@@ -296,115 +288,41 @@ function logout(){
   document.getElementById('pw-input').value='';
 }
 
-function loadShared(){try{return JSON.parse(localStorage.getItem('emnet_cfg')||'null');}catch{return null;}}
-function saveShared(){
-  localStorage.setItem('emnet_cfg',JSON.stringify({
-    hostMode,
-    DC:DC.map(c=>({on:c.on,start:c.start,end:c.end,open:[...c.open]})),
-    DATE_CFG:Object.fromEntries(Object.entries(DATE_CFG).map(([k,v])=>[k,{start:v.start,end:v.end,open:[...v.open]}])),
-    duration:document.getElementById('duration').value,
-    interval:document.getElementById('interval').value,
-    meetingName:document.getElementById('meeting-name').value,
-    bookings:G.bookings,
-    flowUrl:document.getElementById('flow-url')?.value||''
-  }));
-}
-
-const DC=[
-  {on:true,start:'09:00',end:'18:00',open:new Set(['09:00','10:00','11:00','13:00','14:00','15:00','16:00','17:00'])},
-  {on:true,start:'09:00',end:'18:00',open:new Set(['09:00','10:00','11:00','13:00','14:00','15:00','16:00','17:00'])},
-  {on:true,start:'09:00',end:'18:00',open:new Set(['09:00','10:00','11:00','13:00','14:00','15:00','16:00','17:00'])},
-  {on:true,start:'09:00',end:'18:00',open:new Set(['09:00','10:00','11:00','13:00','14:00','15:00','16:00','17:00'])},
-  {on:true,start:'09:00',end:'18:00',open:new Set(['09:00','10:00','11:00','13:00','14:00','15:00','16:00','17:00'])},
-  {on:false,start:'09:00',end:'18:00',open:new Set()},
-  {on:false,start:'09:00',end:'18:00',open:new Set()},
-];
-const DATE_CFG={};
-let selectedHostDate=null;
-let hostMode='weekly';
-let hostCal={m:today.getMonth(),y:today.getFullYear()};
-let G={filter:'all',bookings:[]};
-
-const fmt=(y,m,d)=>`${y}-${String(m).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
-const isPast=ds=>{const[y,m,d]=ds.split('-');return new Date(y,m-1,d)<new Date(today.getFullYear(),today.getMonth(),today.getDate());};
-const isHol=ds=>!!HOL[ds];
-const getDur=()=>parseInt(document.getElementById('duration').value)||60;
-const getIntv=()=>parseInt(document.getElementById('interval').value)||30;
-const toMin=t=>{const[h,m]=t.split(':').map(Number);return h*60+m;};
-const toTime=m=>`${String(Math.floor(m/60)).padStart(2,'0')}:${String(m%60).padStart(2,'0')}`;
-function genStarts(start,end,intv,dur){const a=[];let c=toMin(start);const e=toMin(end);while(c+dur<=e){a.push(toTime(c));c+=intv;}return a;}
-function toast(msg){const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2000);}
-
-/* ══ 초기화 모달 ══ */
-function openResetModal(){document.getElementById('reset-modal').classList.add('show');}
-function closeResetModal(){document.getElementById('reset-modal').classList.remove('show');}
-async function doReset(){
-  try{
-    const res=await fetch("https://ms365emnet-my.sharepoint.com/personal/kc_lee_emnet_co_kr/_api/lists/getbytitle('플래닝본부 1ON1 예약알림')/items?$select=ID",{
-      headers:{'Accept':'application/json;odata=nometadata'}
-    });
-    const data=await res.json();
-    const items=data?.value||[];
-    await Promise.all(items.map(i=>
-      fetch(`https://ms365emnet-my.sharepoint.com/personal/kc_lee_emnet_co_kr/_api/lists/getbytitle('플래닝본부 1ON1 예약알림')/items(${i.ID})`,{
-        method:'DELETE',headers:{'IF-MATCH':'*'}
-      })
-    ));
-  }catch(e){console.log('초기화 오류:',e);}
-  closeResetModal();
-  renderList();
-  toast('예약 현황이 초기화되었어요');
-}
-
 function init(){
-  const saved=loadShared();
-  if(saved){
-    if(saved.DC) saved.DC.forEach((c,i)=>{DC[i].on=c.on;DC[i].start=c.start;DC[i].end=c.end;DC[i].open=new Set(c.open);});
-    if(saved.DATE_CFG) Object.entries(saved.DATE_CFG).forEach(([k,v])=>{DATE_CFG[k]={start:v.start,end:v.end,open:new Set(v.open)};});
-    if(saved.hostMode) hostMode=saved.hostMode;
-    if(saved.bookings) G.bookings=saved.bookings;
-    if(saved.duration) document.getElementById('duration').value=saved.duration;
-    if(saved.interval) document.getElementById('interval').value=saved.interval;
-    if(saved.meetingName) document.getElementById('meeting-name').value=saved.meetingName;
-    if(saved.flowUrl) document.getElementById('flow-url').value=saved.flowUrl;
-  }
-  setHostMode(hostMode);
+  setMode('weekly');
   renderDayBlocks();
   renderList();
-  renderReminderLog();
 }
 
 function switchTab(t){
-  ['host','list','reminder'].forEach(id=>document.getElementById('tab-'+id).style.display=id===t?'block':'none');
-  document.querySelectorAll('.tab').forEach((el,i)=>el.classList.toggle('active',['host','list','reminder'][i]===t));
+  ['host','list'].forEach(id=>document.getElementById('tab-'+id).style.display=id===t?'block':'none');
+  document.querySelectorAll('.tab').forEach((el,i)=>el.classList.toggle('active',['host','list'][i]===t));
   if(t==='list') renderList();
 }
 
-function setHostMode(m){
+function setMode(m){
   hostMode=m;
   document.getElementById('mode-weekly').style.display=m==='weekly'?'block':'none';
   document.getElementById('mode-dates').style.display=m==='dates'?'block':'none';
   document.getElementById('mode-btn-weekly').classList.toggle('active',m==='weekly');
   document.getElementById('mode-btn-dates').classList.toggle('active',m==='dates');
-  if(m==='weekly') renderDayBlocks();
   if(m==='dates') renderHostCal();
-  saveShared();
 }
 
-function onSettingChange(){
+function rebuildSlots(){
   DAYS.forEach((_,i)=>{const s=genStarts(DC[i].start,DC[i].end,getIntv(),getDur());DC[i].open=new Set([...DC[i].open].filter(x=>s.includes(x)));});
   Object.keys(DATE_CFG).forEach(ds=>{const s=genStarts(DATE_CFG[ds].start,DATE_CFG[ds].end,getIntv(),getDur());DATE_CFG[ds].open=new Set([...DATE_CFG[ds].open].filter(x=>s.includes(x)));});
   renderDayBlocks();
-  saveShared();
 }
 
+// 요일 반복
 function renderDayBlocks(){
   document.getElementById('day-blocks').innerHTML=DAYS.map((d,i)=>{
     const cfg=DC[i];
     const starts=genStarts(cfg.start,cfg.end,getIntv(),getDur());
-    const openCnt=[...cfg.open].filter(s=>starts.includes(s)).length;
-    const sumTxt=cfg.on?(openCnt>0?`${openCnt}개 슬롯 열림`:'슬롯 없음'):'비활성';
-    const sumCls=cfg.on&&openCnt>0?'has':'none';
+    const cnt=[...cfg.open].filter(s=>starts.includes(s)).length;
+    const sumTxt=cfg.on?(cnt>0?`${cnt}개 슬롯 열림`:'슬롯 없음'):'비활성';
+    const sumCls=cfg.on&&cnt>0?'has':'none';
     const chks=starts.map(s=>`<div class="sc-item"><input type="checkbox" id="wsl_${i}_${s.replace(':','')}" ${cfg.open.has(s)?'checked':''} onchange="toggleWeeklyOpen(${i},'${s}',this.checked)"/><label for="wsl_${i}_${s.replace(':','')}"> ${s}</label></div>`).join('');
     return `<div class="day-block" id="db-${i}">
       <div class="day-header" onclick="toggleDayBody(${i})">
@@ -412,7 +330,7 @@ function renderDayBlocks(){
         <span class="day-name-lbl">${d}요일</span>
         <span class="on-off-txt ${cfg.on?'on':'off'}">${cfg.on?'ON':'OFF'}</span>
         <span class="day-summary ${sumCls}" style="margin-left:auto">${sumTxt}</span>
-        <span style="font-size:14px;color:#bbb;margin-left:10px" id="arr-${i}">${cfg.on?'›':'—'}</span>
+        <span style="font-size:14px;color:#bbb;margin-left:10px" id="arr-${i}">›</span>
       </div>
       <div class="day-body" id="dbody-${i}" style="display:none">
         <div class="range-row">
@@ -430,25 +348,25 @@ function renderDayBlocks(){
     </div>`;
   }).join('');
 }
-
 function toggleDayBody(i){if(!DC[i].on)return;const b=document.getElementById(`dbody-${i}`);const a=document.getElementById(`arr-${i}`);const open=b.style.display!=='none';b.style.display=open?'none':'block';a.textContent=open?'›':'⌄';}
-function toggleDayOn(i,on){DC[i].on=on;renderDayBlocks();saveShared();}
-function changeWeeklyRange(i,type,val){DC[i][type]=val;const s=genStarts(DC[i].start,DC[i].end,getIntv(),getDur());DC[i].open=new Set([...DC[i].open].filter(x=>s.includes(x)));renderDayBlocks();saveShared();}
-function toggleWeeklyOpen(i,s,checked){if(checked)DC[i].open.add(s);else DC[i].open.delete(s);saveShared();}
-function selAllWeekly(i){const s=genStarts(DC[i].start,DC[i].end,getIntv(),getDur());s.forEach(x=>DC[i].open.add(x));renderDayBlocks();saveShared();}
-function clrAllWeekly(i){DC[i].open.clear();renderDayBlocks();saveShared();}
+function toggleDayOn(i,on){DC[i].on=on;renderDayBlocks();}
+function changeWeeklyRange(i,type,val){DC[i][type]=val;const s=genStarts(DC[i].start,DC[i].end,getIntv(),getDur());DC[i].open=new Set([...DC[i].open].filter(x=>s.includes(x)));renderDayBlocks();}
+function toggleWeeklyOpen(i,s,checked){if(checked)DC[i].open.add(s);else DC[i].open.delete(s);}
+function selAllWeekly(i){const s=genStarts(DC[i].start,DC[i].end,getIntv(),getDur());s.forEach(x=>DC[i].open.add(x));renderDayBlocks();}
+function clrAllWeekly(i){DC[i].open.clear();renderDayBlocks();}
 
+// 특정 날짜
 function renderHostCal(){
   const{m,y}=hostCal;
-  document.getElementById('host-cal-ml').textContent=`${y}년 ${m+1}월`;
-  document.getElementById('host-cal-dlabels').innerHTML=DAYS.map(d=>`<div class="dlabel">${d}</div>`).join('');
+  document.getElementById('host-ml').textContent=`${y}년 ${m+1}월`;
+  document.getElementById('host-dlabels').innerHTML=DAYS.map(d=>`<div class="dlabel">${d}</div>`).join('');
   const first=(new Date(y,m,1).getDay()+6)%7,dim=new Date(y,m+1,0).getDate();
   let html='<div class="week-grid">';
   for(let i=0;i<first;i++)html+='<div></div>';
   for(let d=1;d<=dim;d++){
     const ds=fmt(y,m+1,d);
     const ip=isPast(ds),h=isHol(ds)?HOL[ds]:null;
-    const isOpen=!!DATE_CFG[ds];const isSel=selectedHostDate===ds;
+    const isOpen=!!DATE_CFG[ds];const isSel=selHostDate===ds;
     let cls='cal-day';
     if(ip)cls+=' past';else if(h)cls+=' hol';else if(isSel)cls+=' sel';else if(isOpen)cls+=' host-open';
     html+=`<div class="${cls}" onclick="toggleHostDate('${ds}')">${d}${h?`<span class="hname">${HOL[ds].slice(0,3)}</span>`:''}</div>`;
@@ -459,14 +377,14 @@ function renderHostCal(){
 function chHostMonth(d){hostCal.m+=d;if(hostCal.m>11){hostCal.m=0;hostCal.y++;}if(hostCal.m<0){hostCal.m=11;hostCal.y--;}renderHostCal();}
 function toggleHostDate(ds){
   if(isPast(ds)||isHol(ds))return;
-  if(DATE_CFG[ds]&&selectedHostDate===ds){delete DATE_CFG[ds];selectedHostDate=null;document.getElementById('date-slot-editor').style.display='none';renderHostCal();saveShared();toast('날짜 해제됨');return;}
-  if(!DATE_CFG[ds]){DATE_CFG[ds]={start:'09:00',end:'18:00',open:new Set(['09:00','10:00','11:00','13:00','14:00','15:00','16:00','17:00'])};toast('날짜 추가됨');}
-  selectedHostDate=ds;renderHostCal();renderDateSlotEditor(ds);saveShared();
+  if(DATE_CFG[ds]&&selHostDate===ds){delete DATE_CFG[ds];selHostDate=null;document.getElementById('date-editor').style.display='none';renderHostCal();toast('날짜 해제됨');return;}
+  if(!DATE_CFG[ds])DATE_CFG[ds]={start:'09:00',end:'18:00',open:new Set(['09:00','10:00','11:00','13:00','14:00','15:00','16:00','17:00'])};
+  selHostDate=ds;renderHostCal();renderDateEditor(ds);
 }
-function renderDateSlotEditor(ds){
+function renderDateEditor(ds){
   const cfg=DATE_CFG[ds];const p=ds.split('-');const dow=DAYS[(new Date(ds).getDay()+6)%7];
-  document.getElementById('date-slot-editor').style.display='block';
-  document.getElementById('date-slot-title').textContent=`${p[1]}월 ${p[2]}일 (${dow}) 슬롯 설정`;
+  document.getElementById('date-editor').style.display='block';
+  document.getElementById('date-editor-title').textContent=`${p[1]}월 ${p[2]}일 (${dow}) 슬롯 설정`;
   const fillSel=(id,val)=>{const s=document.getElementById(id);s.innerHTML='';TIMES.forEach(t=>{const o=document.createElement('option');o.value=t;o.textContent=t;if(t===val)o.selected=true;s.appendChild(o);});};
   fillSel('date-start',cfg.start);fillSel('date-end',cfg.end);
   renderDateSlotChecks(ds);
@@ -475,123 +393,84 @@ function renderDateSlotChecks(ds){
   const cfg=DATE_CFG[ds];const starts=genStarts(cfg.start,cfg.end,getIntv(),getDur());
   document.getElementById('date-slot-checks').innerHTML=starts.map(s=>`<div class="sc-item"><input type="checkbox" id="dsl_${s.replace(':','')}" ${cfg.open.has(s)?'checked':''} onchange="toggleDateOpen('${ds}','${s}',this.checked)"/><label for="dsl_${s.replace(':','')}"> ${s}</label></div>`).join('');
 }
-function onDateRangeChange(){if(!selectedHostDate||!DATE_CFG[selectedHostDate])return;const cfg=DATE_CFG[selectedHostDate];cfg.start=document.getElementById('date-start').value;cfg.end=document.getElementById('date-end').value;const s=genStarts(cfg.start,cfg.end,getIntv(),getDur());cfg.open=new Set([...cfg.open].filter(x=>s.includes(x)));renderDateSlotChecks(selectedHostDate);saveShared();}
-function toggleDateOpen(ds,s,checked){if(!DATE_CFG[ds])return;if(checked)DATE_CFG[ds].open.add(s);else DATE_CFG[ds].open.delete(s);saveShared();}
-function selectAllDateSlots(){if(!selectedHostDate||!DATE_CFG[selectedHostDate])return;const cfg=DATE_CFG[selectedHostDate];genStarts(cfg.start,cfg.end,getIntv(),getDur()).forEach(s=>cfg.open.add(s));renderDateSlotChecks(selectedHostDate);saveShared();}
-function clearAllDateSlots(){if(!selectedHostDate||!DATE_CFG[selectedHostDate])return;DATE_CFG[selectedHostDate].open.clear();renderDateSlotChecks(selectedHostDate);saveShared();}
-function removeDate(){if(!selectedHostDate)return;delete DATE_CFG[selectedHostDate];selectedHostDate=null;document.getElementById('date-slot-editor').style.display='none';renderHostCal();saveShared();toast('날짜 삭제됨');}
+function onDateRangeChange(){
+  if(!selHostDate||!DATE_CFG[selHostDate])return;
+  const cfg=DATE_CFG[selHostDate];
+  cfg.start=document.getElementById('date-start').value;
+  cfg.end=document.getElementById('date-end').value;
+  const s=genStarts(cfg.start,cfg.end,getIntv(),getDur());
+  cfg.open=new Set([...cfg.open].filter(x=>s.includes(x)));
+  renderDateSlotChecks(selHostDate);
+}
+function toggleDateOpen(ds,s,checked){if(!DATE_CFG[ds])return;if(checked)DATE_CFG[ds].open.add(s);else DATE_CFG[ds].open.delete(s);}
+function selAllDate(){if(!selHostDate||!DATE_CFG[selHostDate])return;const cfg=DATE_CFG[selHostDate];genStarts(cfg.start,cfg.end,getIntv(),getDur()).forEach(s=>cfg.open.add(s));renderDateSlotChecks(selHostDate);}
+function clrAllDate(){if(!selHostDate||!DATE_CFG[selHostDate])return;DATE_CFG[selHostDate].open.clear();renderDateSlotChecks(selHostDate);}
+function removeDate(){if(!selHostDate)return;delete DATE_CFG[selHostDate];selHostDate=null;document.getElementById('date-editor').style.display='none';renderHostCal();toast('날짜 삭제됨');}
+
+// ★ 핵심: 설정을 URL에 담아서 링크 생성
+function generateBookLink(){
+  const cfg={
+    mode:hostMode,
+    dur:getDur(),
+    intv:getIntv(),
+    name:document.getElementById('meeting-name').value,
+    DC:DC.map(c=>({on:c.on,start:c.start,end:c.end,open:[...c.open]})),
+    dates:Object.fromEntries(Object.entries(DATE_CFG).map(([k,v])=>[k,{start:v.start,end:v.end,open:[...v.open]}]))
+  };
+  const encoded=btoa(unescape(encodeURIComponent(JSON.stringify(cfg))));
+  const url=`${BASE_URL}/book?cfg=${encoded}`;
+  document.getElementById('link-url-text').textContent=url;
+  document.getElementById('link-result').style.display='block';
+  toast('링크 생성 완료!');
+}
 
 function copyBookLink(){
-  navigator.clipboard.writeText('https://1on1-psi.vercel.app/book').catch(()=>{});
+  const url=document.getElementById('link-url-text').textContent;
+  navigator.clipboard.writeText(url).catch(()=>{});
   toast('링크 복사됨!');
 }
 
-function setFilter(f,el){
-  G.filter=f;
-  document.querySelectorAll('.fbtn').forEach(b=>b.classList.remove('active'));
-  el.classList.add('active');
+// 예약 현황
+function setFilter(f,el){filter=f;document.querySelectorAll('.fbtn').forEach(b=>b.classList.remove('active'));el.classList.add('active');renderList();}
+
+function confirmBk(tok){
+  const bks=loadBookings();
+  const bk=bks.find(b=>b.tok===tok);
+  if(!bk)return;
+  bk.status='confirmed';
+  saveBookings(bks);
   renderList();
+  toast('확정되었어요');
 }
 
-/* ══ Lists URL ══ */
-const QUERY_URL='https://default2edf7fa3bf254a2fb1fd9340d34c69.cc.environment.api.powerplatform.com:443/powerautomate/automations/direct/workflows/0fcdcbdbffa94378beb133b676fe592d/triggers/manual/paths/invoke?api-version=1&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=G5qsrP80wugdv4sJtKD31X3laIACgKpOUVINcFHZapk';
-
-const LISTS_ALL_URL='https://ms365emnet-my.sharepoint.com/personal/kc_lee_emnet_co_kr/_api/lists/getbytitle(\'플래닝본부 1ON1 예약알림\')/items?$select=ID,OData__xc608__xc57d__xc790__xba85_,OData__xc774__xba54__xc77c_,OData__xbbf8__xd305__xc77c__xc790_,OData__xbbf8__xd305__xc2dc__xac04_,OData__xba54__xbaa8_,OData__xc0c1__xd0dc_&$orderby=OData__xbbf8__xd305__xc77c__xc790_ asc';
-
-async function fetchAllBookings(){
-  try{
-    document.getElementById('bk-list').innerHTML='<div class="empty">불러오는 중...</div>';
-    const res=await fetch(LISTS_ALL_URL,{
-      headers:{'Accept':'application/json;odata=nometadata'}
-    });
-    const data=await res.json();
-    return (data?.value||[]).map(i=>({
-      id:i.ID,
-      name:i['OData__xc608__xc57d__xc790__xba85_']||'',
-      email:i['OData__xc774__xba54__xc77c_']||'',
-      date:i['OData__xbbf8__xd305__xc77c__xc790_']||'',
-      slot:i['OData__xbbf8__xd305__xc2dc__xac04_']||'',
-      slotEnd:'',
-      memo:i['OData__xba54__xbaa8_']||'',
-      status:typeof i['OData__xc0c1__xd0dc_']==='object'?i['OData__xc0c1__xd0dc_']?.Value||'대기':i['OData__xc0c1__xd0dc_']||'대기'
-    }));
-  }catch(e){
-    console.log('Lists 조회 오류:',e);
-    return [];
-  }
-}
-
-async function confirmBk(bookingId){
-  await updateListsStatus(bookingId,'확정');
-  toast('예약이 확정되었어요');
+function cancelBk(tok){
+  const bks=loadBookings();
+  const bk=bks.find(b=>b.tok===tok);
+  if(!bk)return;
+  bk.status='cancelled';
+  saveBookings(bks);
   renderList();
+  toast('취소되었어요');
 }
 
-async function cancelBk(bookingId){
-  await updateListsStatus(bookingId,'취소');
-  toast('예약이 취소되었어요');
-  renderList();
-}
-
-async function updateListsStatus(itemId,status){
-  try{
-    await fetch(`https://ms365emnet-my.sharepoint.com/personal/kc_lee_emnet_co_kr/_api/lists/getbytitle('플래닝본부 1ON1 예약알림')/items(${itemId})`,{
-      method:'PATCH',
-      headers:{
-        'Accept':'application/json;odata=nometadata',
-        'Content-Type':'application/json;odata=nometadata',
-        'IF-MATCH':'*',
-        'X-HTTP-Method':'MERGE'
-      },
-      body:JSON.stringify({'OData__xc0c1__xd0dc_':status})
-    });
-  }catch(e){
-    console.log('상태 업데이트 오류:',e);
-  }
-}
-
-async function renderList(){
-  const allBk=await fetchAllBookings();
-  const statusMap={'대기':'pending','확정':'confirmed','취소':'cancelled'};
-  const mapped=allBk.map(b=>({...b,statusKey:statusMap[b.status]||'pending'}));
-  const fl=mapped.filter(b=>{
-    if(G.filter==='all') return true;
-    return b.statusKey===G.filter;
-  }).sort((a,b)=>a.date.localeCompare(b.date)||a.slot.localeCompare(b.slot));
+function renderList(){
+  const bks=loadBookings();
+  const fl=bks.filter(b=>filter==='all'||b.status===filter).sort((a,b)=>a.date.localeCompare(b.date)||a.slot.localeCompare(b.slot));
   document.getElementById('bk-count').textContent=`총 ${fl.length}건`;
   if(!fl.length){document.getElementById('bk-list').innerHTML='<div class="empty">예약이 없습니다</div>';return;}
   document.getElementById('bk-list').innerHTML=fl.map(b=>{
-    const p=b.date.split('-');
-    const dow=DAYS[(new Date(b.date).getDay()+6)%7];
-    const sc=b.statusKey==='confirmed'?'s-ok':b.statusKey==='pending'?'s-wait':'s-no';
-    const sl=b.status;
-    const bid=b.id;
+    const p=b.date.split('-');const dow=DAYS[(new Date(b.date).getDay()+6)%7];
+    const sc=b.status==='confirmed'?'s-ok':b.status==='pending'?'s-wait':'s-no';
+    const sl=b.status==='confirmed'?'확정':b.status==='pending'?'대기':'취소됨';
     return `<div class="bk-item">
-      <div class="av">${(b.name||'?').slice(0,2)}</div>
-      <div style="min-width:90px">
-        <div style="font-size:14px;font-weight:600">${p[1]}/${p[2]} (${dow})</div>
-        <div style="font-size:12px;color:#888">${b.slot}</div>
-      </div>
-      <div style="flex:1;min-width:0">
-        <div style="font-size:14px">${b.name}</div>
-        <div style="font-size:12px;color:#999;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${b.memo||b.email}</div>
-      </div>
+      <div class="av">${b.name.slice(0,2)}</div>
+      <div style="min-width:90px"><div style="font-size:14px;font-weight:600">${p[1]}/${p[2]} (${dow})</div><div style="font-size:12px;color:#888">${b.slot} ~ ${b.slotEnd}</div></div>
+      <div style="flex:1;min-width:0"><div style="font-size:14px">${b.name}</div><div style="font-size:12px;color:#999;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${b.memo||b.email}</div></div>
       <span class="sbadge ${sc}">${sl}</span>
-      ${b.statusKey==='pending'?`<button class="btn-sm" style="font-size:11px;padding:4px 10px" onclick="confirmBk('${bid}')">확정</button>`:''}
-      ${b.statusKey!=='cancelled'?`<button class="btn-dsm" onclick="cancelBk('${bid}')">취소</button>`:''}
+      ${b.status==='pending'?`<button class="btn-sm" style="font-size:11px;padding:4px 10px" onclick="confirmBk('${b.tok}')">확정</button>`:''}
+      ${b.status!=='cancelled'?`<button class="btn-dsm" onclick="cancelBk('${b.tok}')">취소</button>`:''}
     </div>`;
   }).join('');
-}
-
-function renderReminderLog(){
-  const saved=loadShared();
-  const log=saved?.remLog||[];
-  document.getElementById('reminder-log').innerHTML=log.length?log.map(l=>`
-    <div style="display:flex;align-items:center;gap:10px;padding:9px 0;border-bottom:1px solid #f5f5f5">
-      <div class="av">${l.name.slice(0,2)}</div>
-      <div style="flex:1"><div style="font-size:13px">${l.name}</div><div style="font-size:12px;color:#999">${l.time}</div></div>
-      <span class="sbadge s-ok">${l.st}</span>
-    </div>`).join(''):'<div class="empty">발송 내역 없음</div>';
 }
 </script>
 </body>
