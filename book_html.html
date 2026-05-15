@@ -169,12 +169,14 @@ function isAvailDate(ds){
     const dc=CFG.DC[dow];
     if(!dc||!dc.on) return false;
     const starts=genStarts(dc.start,dc.end,CFG.intv,CFG.dur);
-    return dc.open.some(s=>starts.includes(s));
+    const openList=Array.isArray(dc.open)?dc.open:[...dc.open];
+    return openList.some(s=>starts.includes(s));
   } else {
     const dc=CFG.dates&&CFG.dates[ds];
     if(!dc) return false;
     const starts=genStarts(dc.start,dc.end,CFG.intv,CFG.dur);
-    return dc.open.some(s=>starts.includes(s));
+    const openList=Array.isArray(dc.open)?dc.open:[...dc.open];
+    return openList.some(s=>starts.includes(s));
   }
 }
 
@@ -188,7 +190,8 @@ function getOpenSlots(ds){
     dc=CFG.dates&&CFG.dates[ds];if(!dc)return [];
   }
   const starts=genStarts(dc.start,dc.end,CFG.intv,CFG.dur);
-  return dc.open.filter(s=>starts.includes(s)).sort().map(s=>({start:s,end:toTime(toMin(s)+CFG.dur)}));
+  const openList=Array.isArray(dc.open)?dc.open:[...dc.open];
+  return openList.filter(s=>starts.includes(s)).sort().map(s=>({start:s,end:toTime(toMin(s)+CFG.dur)}));
 }
 
 function renderBookCal(){
