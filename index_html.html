@@ -418,11 +418,14 @@ function generateBookLink(){
   
   // mode에 따라 다르게 처리
   if(hostMode==='weekly'){
-    // 요일반복: DC만 저장
-    cfg.DC=DC.map(c=>({on:c.on,start:c.start,end:c.end,open:[...c.open]}));
+    // 요일반복: DC만 저장 (open을 반드시 배열로)
+    cfg.DC=DC.map(c=>{
+      const openArray=Array.from(c.open);
+      return {on:c.on,start:c.start,end:c.end,open:openArray};
+    });
   } else {
     // 날짜선택: dates만 저장
-    cfg.dates=Object.fromEntries(Object.entries(DATE_CFG).map(([k,v])=>[k,{start:v.start,end:v.end,open:[...v.open]}]));
+    cfg.dates=Object.fromEntries(Object.entries(DATE_CFG).map(([k,v])=>[k,{start:v.start,end:v.end,open:Array.from(v.open)}]));
   }
   
   const jsonStr=JSON.stringify(cfg);
