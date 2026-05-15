@@ -154,10 +154,12 @@ function init(){
   }
   try{
     CFG=JSON.parse(decodeURIComponent(escape(atob(encoded))));
+    console.log('CFG 파싱 성공:', CFG);
     document.getElementById('main-content').style.display='block';
     if(CFG.name) document.getElementById('header-sub').textContent=CFG.name+' 예약';
     renderBookCal();
   }catch(e){
+    console.error('CFG 파싱 실패:', e);
     document.getElementById('no-cfg-msg').style.display='block';
   }
 }
@@ -165,18 +167,20 @@ function init(){
 function isAvailDate(ds){
   if(!CFG||isHol(ds)||isPast(ds)) return false;
   if(CFG.mode==='weekly'){
+    if(!CFG.DC||!Array.isArray(CFG.DC)) return false;
     const dow=(new Date(ds).getDay()+6)%7;
     const dc=CFG.DC[dow];
     if(!dc||!dc.on) return false;
     const starts=genStarts(dc.start,dc.end,CFG.intv,CFG.dur);
     const openList=Array.isArray(dc.open)?dc.open:[...dc.open];
-    return openList.some(s=>starts.includes(s));
+    return openList&&openList.some(s=>starts.includes(s));
   } else {
-    const dc=CFG.dates&&CFG.dates[ds];
+    if(!CFG.dates) return false;
+    const dc=CFG.dates[ds];
     if(!dc) return false;
     const starts=genStarts(dc.start,dc.end,CFG.intv,CFG.dur);
     const openList=Array.isArray(dc.open)?dc.open:[...dc.open];
-    return openList.some(s=>starts.includes(s));
+    return openList&&openList.some(s=>starts.includes(s));
   }
 }
 
