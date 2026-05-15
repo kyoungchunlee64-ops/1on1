@@ -425,7 +425,8 @@ function generateBookLink(){
     cfg.dates=Object.fromEntries(Object.entries(DATE_CFG).map(([k,v])=>[k,{start:v.start,end:v.end,open:[...v.open]}]));
   }
   
-  const encoded=btoa(unescape(encodeURIComponent(JSON.stringify(cfg))));
+  const jsonStr=JSON.stringify(cfg);
+  const encoded=btoa(jsonStr);
   const url=`${BASE_URL}/book?cfg=${encoded}`;
   document.getElementById('link-url-text').textContent=url;
   document.getElementById('link-result').style.display='block';
