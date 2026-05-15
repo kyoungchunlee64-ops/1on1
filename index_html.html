@@ -418,7 +418,7 @@ function generateBookLink(){
   
   // mode에 따라 다르게 처리
   if(hostMode==='weekly'){
-    // 요일반복: DC만 저장 (open을 반드시 배열로)
+    // 요일반복: DC만 저장
     cfg.DC=DC.map(c=>{
       const openArray=Array.from(c.open);
       return {on:c.on,start:c.start,end:c.end,open:openArray};
@@ -429,7 +429,7 @@ function generateBookLink(){
   }
   
   const jsonStr=JSON.stringify(cfg);
-  const encoded=btoa(jsonStr);
+  const encoded=encodeURIComponent(jsonStr);
   const url=`${BASE_URL}/book?cfg=${encoded}`;
   document.getElementById('link-url-text').textContent=url;
   document.getElementById('link-result').style.display='block';
