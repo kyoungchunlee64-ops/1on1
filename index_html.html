@@ -447,6 +447,16 @@ function setFilter(f,el){filter=f;document.querySelectorAll('.fbtn').forEach(b=>
 
 const PA_URL='https://default2edf7fa3bf254a2fb1fd9340d34c69.cc.environment.api.powerplatform.com:443/powerautomate/automations/direct/workflows/0fcdcbdbffa94378beb133b676fe592d/triggers/manual/paths/invoke?api-version=1&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=G5qsrP80wugdv4sJtKD31X3laIACgKpOUVINcFHZapk';
 
+async function pendingBk(tok){
+  await fetch(PA_URL,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({action:'update',itemId:parseInt(tok),newStatus:'대기'})});
+  const btns=document.querySelectorAll('.fbtn');
+  filter='pending';
+  btns.forEach(b=>b.classList.remove('active'));
+  btns[2].classList.add('active');
+  await renderList();
+  toast('대기로 변경되었어요');
+}
+
 async function confirmBk(tok){
   await fetch(PA_URL,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({action:'update',itemId:parseInt(tok),newStatus:'확정'})});
   const btns=document.querySelectorAll('.fbtn');
@@ -485,8 +495,9 @@ async function renderList(){
         <div style="min-width:90px"><div style="font-size:14px;font-weight:600">${p[1]}/${p[2]} (${dow})</div><div style="font-size:12px;color:#888">${b.slot} ~ ${b.slotEnd}</div></div>
         <div style="flex:1;min-width:0"><div style="font-size:14px">${b.name}</div><div style="font-size:12px;color:#999;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${b.memo||b.email}</div></div>
         <span class="sbadge ${sc}">${sl}</span>
-        ${b.status==='pending'||b.status==='confirmed'?`<button class="btn-sm" style="font-size:11px;padding:4px 10px" onclick="confirmBk('${b.tok}')">확정</button>`:''}
-        ${b.status==='pending'||b.status==='confirmed'?`<button class="btn-dsm" onclick="cancelBk('${b.tok}')">취소</button>`:''}
+        ${b.status==='pending'?`<button class="btn-sm" style="font-size:11px;padding:4px 10px" onclick="confirmBk('${b.tok}')">확정</button><button class="btn-dsm" onclick="cancelBk('${b.tok}')">취소</button>`:''}
+        ${b.status==='confirmed'?`<button class="btn-dsm" onclick="cancelBk('${b.tok}')">취소</button>`:''}
+        ${b.status==='cancelled'?`<button class="btn-sm" style="font-size:11px;padding:4px 10px" onclick="pendingBk('${b.tok}')">대기</button><button class="btn-sm" style="font-size:11px;padding:4px 10px;margin-left:4px" onclick="confirmBk('${b.tok}')">확정</button>`:''}
       </div>`;
     }).join('');
   }catch(e){
