@@ -445,45 +445,30 @@ function copyBookLink(){
 // 예약 현황
 function setFilter(f,el){filter=f;document.querySelectorAll('.fbtn').forEach(b=>b.classList.remove('active'));el.classList.add('active');renderList();}
 
-function confirmBk(tok){
-  updateListsStatus(tok,'confirmed');
-  renderList();
+async function confirmBk(tok){
+  await updateListsStatus(tok,'confirmed');
+  const btns=document.querySelectorAll('.fbtn');
+  setFilter('confirmed', btns[1]);
   toast('확정되었어요');
 }
 
-function cancelBk(tok){
-  updateListsStatus(tok,'cancelled');
-  renderList();
+async function cancelBk(tok){
+  await updateListsStatus(tok,'cancelled');
+  const btns=document.querySelectorAll('.fbtn');
+  setFilter('cancelled', btns[3]);
   toast('취소되었어요');
 }
 
 async function updateListsStatus(tok,status){
+  const FLOW_URL='https://default2edf7fa3bf254a2fb1fd9340d34c69.cc.environment.api.powerplatform.com:443/powerautomate/automations/direct/workflows/0fcdcbdbffa94378beb133b676fe592d/triggers/manual/paths/invoke?api-version=1&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=G5qsrP80wugdv4sJtKD31X3laIACgKpOUVINcFHZapk';
   const statusMap={'confirmed':'확정','cancelled':'취소','pending':'대기'};
-  const statusVal=statusMap[status]||'대기';
   try{
-    await fetch(`https://ms365emnet-my.sharepoint.com/personal/kc_lee_emnet_co_kr/_api/lists/getbytitle('플래닝본부 1ON1 예약알림')/items(${tok})`,{
+    await fetch(FLOW_URL,{
       method:'POST',
-      headers:{
-        'Accept':'application/json;odata=nometadata',
-        'Content-Type':'application/json;odata=nometadata',
-        'X-HTTP-Method':'MERGE',
-        'IF-MATCH':'*',
-        'X-RequestDigest': await getRequestDigest()
-      },
-      body:JSON.stringify({'OData__xc0c1__xd0dc_':statusVal})
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({itemId:tok,newStatus:statusMap[status]})
     });
   }catch(e){console.error('상태 업데이트 실패:',e);}
-}
-
-async function getRequestDigest(){
-  try{
-    const res=await fetch('https://ms365emnet-my.sharepoint.com/personal/kc_lee_emnet_co_kr/_api/contextinfo',{
-      method:'POST',
-      headers:{'Accept':'application/json;odata=nometadata','Content-Type':'application/json;odata=nometadata'}
-    });
-    const data=await res.json();
-    return data.FormDigestValue||'';
-  }catch(e){return '';}
 }
 
 async function renderList(){
@@ -512,28 +497,32 @@ async function renderList(){
 }
 
 async function fetchListsBookings(){
-  const QUERY_URL='https://default2edf7fa3bf254a2fb1fd9340d34c69.cc.environment.api.powerplatform.com:443/powerautomate/automations/direct/workflows/0fcdcbdbffa94378beb133b676fe592d/triggers/manual/paths/invoke?api-version=1&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=G5qsrP80wugdv4sJtKD31X3laIACgKpOUVINcFHZapk';
+  const LISTS_URL='https://graph.microsoft.com/v1.0/sites/ms365emnet-my.sharepoint.com/lists/1ON1/items?$expand=fields&$top=100';
   try{
-    const response=await fetch(QUERY_URL,{
-      method:'POST',
-      headers:{'Content-Type':'application/json'},
-      body:JSON.stringify({date:'all'})
+    const response=await fetch(LISTS_URL,{
+      method:'GET',
+      headers:{
+        'Accept':'application/json'
+      }
     });
+    if(!response.ok){
+      console.warn('Lists API 호출 실패, 로컬 데이터 사용');
+      return loadBookings();
+    }
     const data=await response.json();
-    const items=data?.value||[];
-    return items.map(item=>({
-      tok:item['ID']||item['id']||'',
-      name:item['OData__xc608__xc57d__xc790__xba85_']||'',
-      email:item['OData__xc774__xba54__xc77c_']||'',
-      date:item['OData__xbbf8__xd305__xc77c__xc790_']||'',
-      slot:item['OData__xbbf8__xd305__xc2dc__xac04_']||'',
-      slotEnd:calcSlotEnd(item['OData__xbbf8__xd305__xc2dc__xac04_']),
-      memo:item['OData__xba54__xbaa8_']||'',
-      status:mapListsStatus(typeof item['OData__xc0c1__xd0dc_']==='object'?item['OData__xc0c1__xd0dc_']?.Value:item['OData__xc0c1__xd0dc_'])
+    return data.value.map(item=>({
+      tok:item.id,
+      name:item.fields.예약자명||'',
+      email:item.fields.이메일||'',
+      date:item.fields.미팅일자||'',
+      slot:item.fields.미팅시간||'',
+      slotEnd:calcSlotEnd(item.fields.미팅시간),
+      memo:item.fields.미팅메모||'',
+      status:mapListsStatus(item.fields.상태)
     }));
   }catch(e){
     console.error('Lists 조회 실패:',e);
-    return [];
+    return loadBookings();
   }
 }
 
