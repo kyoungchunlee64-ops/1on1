@@ -445,23 +445,20 @@ function copyBookLink(){
 // 예약 현황
 function setFilter(f,el){filter=f;document.querySelectorAll('.fbtn').forEach(b=>b.classList.remove('active'));el.classList.add('active');renderList();}
 
+const PA_URL='https://default2edf7fa3bf254a2fb1fd9340d34c69.cc.environment.api.powerplatform.com:443/powerautomate/automations/direct/workflows/0fcdcbdbffa94378beb133b676fe592d/triggers/manual/paths/invoke?api-version=1&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=G5qsrP80wugdv4sJtKD31X3laIACgKpOUVINcFHZapk';
+
 async function confirmBk(tok){
-  await updateListsStatus(tok,'confirmed');
+  await fetch(PA_URL,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({action:'update',itemId:parseInt(tok),newStatus:'확정'})});
   const btns=document.querySelectorAll('.fbtn');
-  setFilter('confirmed', btns[1]);
+  setFilter('confirmed',btns[1]);
   toast('확정되었어요');
 }
 
 async function cancelBk(tok){
-  await updateListsStatus(tok,'cancelled');
+  await fetch(PA_URL,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({action:'update',itemId:parseInt(tok),newStatus:'취소'})});
   const btns=document.querySelectorAll('.fbtn');
-  setFilter('cancelled', btns[3]);
+  setFilter('cancelled',btns[3]);
   toast('취소되었어요');
-}
-
-async function updateListsStatus(tok,status){
-  // Lists 실제 업데이트는 추후 구현, 현재는 로컬 캐시만 업데이트
-  console.log('상태 업데이트:', tok, status);
 }
 
 async function renderList(){
@@ -490,17 +487,16 @@ async function renderList(){
 }
 
 async function fetchListsBookings(){
-  const QUERY_URL='https://default2edf7fa3bf254a2fb1fd9340d34c69.cc.environment.api.powerplatform.com:443/powerautomate/automations/direct/workflows/0fcdcbdbffa94378beb133b676fe592d/triggers/manual/paths/invoke?api-version=1&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=G5qsrP80wugdv4sJtKD31X3laIACgKpOUVINcFHZapk';
   try{
-    const response=await fetch(QUERY_URL,{
+    const res=await fetch(PA_URL,{
       method:'POST',
       headers:{'Content-Type':'application/json'},
       body:JSON.stringify({action:'query'})
     });
-    const data=await response.json();
+    const data=await res.json();
     const items=data?.value||[];
     return items.map(item=>({
-      tok:item['ID']||'',
+      tok:String(item['ID']||''),
       name:item['OData__xc608__xc57d__xc790__xba85_']||'',
       email:item['OData__xc774__xba54__xc77c_']||'',
       date:item['OData__xbbf8__xd305__xc77c__xc790_']||'',
