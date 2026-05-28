@@ -458,15 +458,32 @@ function cancelBk(tok){
 }
 
 async function updateListsStatus(tok,status){
-  const FLOW_URL='https://default2edf7fa3bf254a2fb1fd9340d34c69.cc.environment.api.powerplatform.com:443/powerautomate/automations/direct/workflows/0fcdcbdbffa94378beb133b676fe592d/triggers/manual/paths/invoke?api-version=1&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=G5qsrP80wugdv4sJtKD31X3laIACgKpOUVINcFHZapk';
   const statusMap={'confirmed':'확정','cancelled':'취소','pending':'대기'};
+  const statusVal=statusMap[status]||'대기';
   try{
-    await fetch(FLOW_URL,{
+    await fetch(`https://ms365emnet-my.sharepoint.com/personal/kc_lee_emnet_co_kr/_api/lists/getbytitle('플래닝본부 1ON1 예약알림')/items(${tok})`,{
       method:'POST',
-      headers:{'Content-Type':'application/json'},
-      body:JSON.stringify({itemId:tok,newStatus:statusMap[status]})
+      headers:{
+        'Accept':'application/json;odata=nometadata',
+        'Content-Type':'application/json;odata=nometadata',
+        'X-HTTP-Method':'MERGE',
+        'IF-MATCH':'*',
+        'X-RequestDigest': await getRequestDigest()
+      },
+      body:JSON.stringify({'OData__xc0c1__xd0dc_':statusVal})
     });
   }catch(e){console.error('상태 업데이트 실패:',e);}
+}
+
+async function getRequestDigest(){
+  try{
+    const res=await fetch('https://ms365emnet-my.sharepoint.com/personal/kc_lee_emnet_co_kr/_api/contextinfo',{
+      method:'POST',
+      headers:{'Accept':'application/json;odata=nometadata','Content-Type':'application/json;odata=nometadata'}
+    });
+    const data=await res.json();
+    return data.FormDigestValue||'';
+  }catch(e){return '';}
 }
 
 async function renderList(){
