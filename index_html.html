@@ -450,14 +450,20 @@ const PA_URL='https://default2edf7fa3bf254a2fb1fd9340d34c69.cc.environment.api.p
 async function confirmBk(tok){
   await fetch(PA_URL,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({action:'update',itemId:parseInt(tok),newStatus:'확정'})});
   const btns=document.querySelectorAll('.fbtn');
-  setFilter('confirmed',btns[1]);
+  filter='confirmed';
+  btns.forEach(b=>b.classList.remove('active'));
+  btns[1].classList.add('active');
+  await renderList();
   toast('확정되었어요');
 }
 
 async function cancelBk(tok){
   await fetch(PA_URL,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({action:'update',itemId:parseInt(tok),newStatus:'취소'})});
   const btns=document.querySelectorAll('.fbtn');
-  setFilter('cancelled',btns[3]);
+  filter='cancelled';
+  btns.forEach(b=>b.classList.remove('active'));
+  btns[3].classList.add('active');
+  await renderList();
   toast('취소되었어요');
 }
 
