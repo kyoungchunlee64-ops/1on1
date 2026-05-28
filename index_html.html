@@ -470,7 +470,10 @@ async function cancelBk(tok){
 async function renderList(){
   try{
     const bks=await fetchListsBookings();
-    const fl=bks.filter(b=>filter==='all'||b.status===filter).sort((a,b)=>a.date.localeCompare(b.date)||a.slot.localeCompare(b.slot));
+    const fl=bks.filter(b=>{
+      if(filter==='all') return b.status!=='cancelled';
+      return b.status===filter;
+    }).sort((a,b)=>a.date.localeCompare(b.date)||a.slot.localeCompare(b.slot));
     document.getElementById('bk-count').textContent=`총 ${fl.length}건`;
     if(!fl.length){document.getElementById('bk-list').innerHTML='<div class="empty">예약이 없습니다</div>';return;}
     document.getElementById('bk-list').innerHTML=fl.map(b=>{
@@ -482,8 +485,8 @@ async function renderList(){
         <div style="min-width:90px"><div style="font-size:14px;font-weight:600">${p[1]}/${p[2]} (${dow})</div><div style="font-size:12px;color:#888">${b.slot} ~ ${b.slotEnd}</div></div>
         <div style="flex:1;min-width:0"><div style="font-size:14px">${b.name}</div><div style="font-size:12px;color:#999;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${b.memo||b.email}</div></div>
         <span class="sbadge ${sc}">${sl}</span>
-        ${b.status==='pending'?`<button class="btn-sm" style="font-size:11px;padding:4px 10px" onclick="confirmBk('${b.tok}')">확정</button>`:''}
-        ${b.status!=='cancelled'?`<button class="btn-dsm" onclick="cancelBk('${b.tok}')">취소</button>`:''}
+        ${b.status==='pending'||b.status==='confirmed'?`<button class="btn-sm" style="font-size:11px;padding:4px 10px" onclick="confirmBk('${b.tok}')">확정</button>`:''}
+        ${b.status==='pending'||b.status==='confirmed'?`<button class="btn-dsm" onclick="cancelBk('${b.tok}')">취소</button>`:''}
       </div>`;
     }).join('');
   }catch(e){
